@@ -32,3 +32,14 @@ options(scientific=T, digits = 3)
 # use scipen=999 to prevent scientific notation at all times
 ```
 
+```{r read the dataset}
+diamonds = data.frame(read.csv("diamonds.csv"))
+summary(diamonds)
+str(diamonds)
+diamonds$color = as.factor(diamonds$color)
+diamonds$clarity = as.factor(diamonds$clarity)
+diamonds$cut = as.factor(diamonds$cut)
+colnames(diamonds)[1] = "ID"
+colnames(diamonds)
+summary(diamonds)
+```
