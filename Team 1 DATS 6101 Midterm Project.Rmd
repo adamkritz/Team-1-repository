@@ -43,3 +43,5 @@ colnames(diamonds)[1] = "ID"
 colnames(diamonds)
 summary(diamonds)
 ```
+
+#Solomon
