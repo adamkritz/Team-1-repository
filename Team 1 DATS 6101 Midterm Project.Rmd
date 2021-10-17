@@ -44,4 +44,64 @@ colnames(diamonds)
 summary(diamonds)
 ```
 
-#Solomon
+
+
+
+# Diamonds $10000+
+
+```{r d10kp summary, results = T}
+diamonds10kplus = subset(diamonds, price > 10000)
+xkablesummary(diamonds10kplus, title = "Summary of Diamonds Over 10,000$")
+```
+
+```{r d10kp categorical variables}
+barplot(table(diamonds10kplus$cut), col = c(2, 3, 4, 7, 6), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
+barplot(table(diamonds10kplus$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
+barplot(table(diamonds10kplus$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplot of Clarity', xlab = "Clarity", ylab = "Frequency")
+```
+
+```{r d10kp numerical variables}
+loadPkg("ggplot2")
+# remove weird outliers
+diaNO = subset(diamonds10kplus, x > 0 & y > 0 & y < 50 & z > 0 & table < 95)
+ggplot(diaNO, aes(x, y, color=z)) +
+  geom_point(size = 8, alpha = 0.6) +
+  ggtitle('Y versus X versus Z for Diamonds') +
+  scale_color_gradient2(midpoint = 5, low="blue", mid="green", high="red")
+
+ggplot(diaNO, aes(y=table)) + 
+  geom_histogram(col="black", 
+                 fill="red", 
+                  alpha = .8,
+                 bins = 20) +
+  labs(title='Boxplot of Table') +
+  labs(y="Table", x="Frequency")
+
+ggplot(diamonds10kplus, aes(y=depth)) + 
+  geom_histogram(col="black", 
+                 fill="green", 
+                  alpha = .8,
+                 bins = 20) +
+  labs(title='Boxplot of Depth') +
+  labs(y="Depth", x="Frequency")
+
+ggplot(diamonds10kplus, aes(y=carat)) + 
+  geom_boxplot() + 
+  geom_boxplot(colour="black", fill="yellow", outlier.colour="yellow", outlier.size=5, alpha = 0.8) +
+  labs(title = 'Boxplot of Carat')
+```
+
+
+```{r d10kp price}
+ggplot(diamonds10kplus, aes(y=price)) + 
+  geom_boxplot() + 
+  geom_boxplot(colour="black", fill="blue", outlier.colour="blue", outlier.size=5, alpha = 0.8) +
+  labs(title = 'Boxplot of Price')
+
+qqnorm(diamonds10kplus$price, main="Q-Q plot of Price", col = 'blue', ylab = 'Price') 
+qqline(diamonds10kplus$price)
+```
+
+```{r d10kp price and categorical}
+
+```
