@@ -150,41 +150,61 @@ library("corrplot")
 corrplot(mtx_num,method = "square", type="upper")
 ```
 
+#SMART: Does cut methods effect price?  
+```{r}
+p = ggplot(diamonds,aes(x = cut,y=price)) + 
+  geom_boxplot(colour="grey", fill=c(2, 3, 4, 7, 6), outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Price in Different Cut methods")
+p + theme_bw() + theme(panel.grid=element_blank())
+anv_pri_cut = aov(price ~ cut,data = diamonds)
+xkabledply(anv_pri_cut,title = "Cut vs Price ANOVA result summary")
+
+```
 
 ```{r}
+tukey_pri_cut <- TukeyHSD(anv_pri_cut)
+tukey_pri_cut
+```
+Diamonds with different cut methods do have different price averages.
 
+#SMART: Does clarity levels effect price?
+```{r}
+p = ggplot(diamonds,aes(x = clarity,y=price)) + 
+  geom_boxplot(colour="orange", fill=c(2, 3, 4, 7, 6 ,5 ,8 ,9), outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Price in Different Clarity levels")
+p + theme_bw() + theme(panel.grid=element_blank())
+anv_pri_cla = aov(price ~ clarity,data = diamonds)
+xkabledply(anv_pri_cla,title = "Clarity vs Price ANOVA result summary")
+```
 
+```{r}
+tukey_pri_cla <- TukeyHSD(anv_pri_cla)
+tukey_pri_cla
+```
+Diamonds in different clarity levels do have different price averages.
+
+#SMART: Does color effect price?  
+```{r}
+p = ggplot(diamonds,aes(x = color,y=price)) + 
+  geom_boxplot(colour="orange", fill=c(2, 3, 4, 7, 6 ,5 ,8 ), outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Price in Different Color")
+p + theme_bw() + theme(panel.grid=element_blank())
+anv_pri_col = aov(price ~ color,data = diamonds)
+xkabledply(anv_pri_col,title = "Clarity vs Price ANOVA result summary")
 ```
 
 
 ```{r}
-
-
+tukey_pri_col <- TukeyHSD(anv_pri_col)
+tukey_pri_col
 ```
 
-
-```{r}
-
-
-```
+Diamonds in different clarity levels do have different price averages.
 
 
-```{r}
 
 
-```
 
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
 
 
 
