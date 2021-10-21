@@ -59,7 +59,7 @@ library(ggplot2)
 library(ezids)
 # histogram
 p = ggplot(diamonds,aes(x=price)) + 
-  geom_histogram(breaks = seq(300,18900,100),fill = "red",color = "black",alpha = 0.3) + labs(title = "Distribution of Price", x = "Price",y = "frequency")
+  geom_histogram(breaks = seq(300,18900,100),fill = "red",color = "grey",alpha = 0.3) + labs(title = "Distribution of Price", x = "Price",y = "frequency")
 p  + theme_bw()
 # boxplot
 p = ggplot(diamonds,aes(y=price)) + 
@@ -141,7 +141,7 @@ barplot(table(diamonds$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplo
 ### Relationship between variables  
 
 #### SMART:what variable effects price ?  
-```{r}
+```{r results='markup'}
 # matrix and corrplot
 diamonds_num = diamonds[,c(2,6,7,8,9,10,11)]
 mtx_num = cor(diamonds_num)
@@ -161,13 +161,13 @@ xkabledply(anv_pri_cut,title = "Cut vs Price ANOVA result summary")
 
 ```
 
-```{r}
+```{r results='markup'}
 tukey_pri_cut <- TukeyHSD(anv_pri_cut)
 tukey_pri_cut
 ```
-Diamonds with different cut methods do have different price averages.
+Diamonds with different cut methods do have different price averages.  
 
-#SMART: Does clarity levels effect price?
+#SMART: Does clarity levels effect price?  
 ```{r}
 p = ggplot(diamonds,aes(x = clarity,y=price)) + 
   geom_boxplot(colour="orange", fill=c(2, 3, 4, 7, 6 ,5 ,8 ,9), outlier.colour="red", outlier.shape=8, outlier.size=4) + 
@@ -177,11 +177,11 @@ anv_pri_cla = aov(price ~ clarity,data = diamonds)
 xkabledply(anv_pri_cla,title = "Clarity vs Price ANOVA result summary")
 ```
 
-```{r}
+```{r results='markup'}
 tukey_pri_cla <- TukeyHSD(anv_pri_cla)
 tukey_pri_cla
 ```
-Diamonds in different clarity levels do have different price averages.
+Diamonds in different clarity levels do have different price averages.  
 
 #SMART: Does color effect price?  
 ```{r}
@@ -194,19 +194,19 @@ xkabledply(anv_pri_col,title = "Clarity vs Price ANOVA result summary")
 ```
 
 
-```{r}
+```{r results='markup'}
 tukey_pri_col <- TukeyHSD(anv_pri_col)
 tukey_pri_col
 ```
 
-Diamonds in different clarity levels do have different price averages.
+Diamonds in different clarity levels do have different price averages.  
 
 
-#### what variable effects cutting methods?
+#### what variable effects cutting methods?  
 
-#SMART: Do different ranks of color have different cutting methods?
+#SMART: Do different ranks of color have different cutting methods?  
 
-```{r}
+```{r results='markup'}
 tab_cut_col = table(diamonds$color,diamonds$cut)
 chitest = chisq.test(tab_cut_col)
 chitest
@@ -235,8 +235,8 @@ Different ranks of color have different cutting methods.
 
 
 
-#SMART: Do different ranks of clarity have different cutting methods?
-```{r}
+#SMART: Do different ranks of clarity have different cutting methods?  
+```{r results='markup'}
 tab_cut_cla = table(diamonds$clarity,diamonds$cut)
 chitest = chisq.test(tab_cut_cla)
 chitest
