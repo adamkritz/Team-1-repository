@@ -14,12 +14,17 @@ output:
     toc_depth: '3'
 ---
 
+
+
 ```{r init, include=F}
 # The package "ezids" (EZ Intro to Data Science) includes a lot of the helper functions we developed for the course. 
 # Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
 library(ezids)
 ```
 
+# Midterm Project
+
+## Importing the Data
 
 ```{r setup, include=FALSE}
 # some of common options (and the defaults) are: 
@@ -36,9 +41,9 @@ options(scientific=T, digits = 3)
 diamonds = data.frame(read.csv("diamonds.csv"))
 summary(diamonds)
 str(diamonds)
-diamonds$color = as.factor(diamonds$color)
-diamonds$clarity = as.factor(diamonds$clarity)
-diamonds$cut = as.factor(diamonds$cut)
+diamonds$color = factor(diamonds$color, order=T, levels = c('D', 'E', 'F', 'G', 'H', 'I', 'J'))
+diamonds$clarity = factor(diamonds$clarity, order=T, levels = c('I1', 'SI2', 'SI1', 'VS2', 'VS1', 'VVS2', 'VVS1', 'IF'))
+diamonds$cut = factor(diamonds$cut, order=T, levels = c('Fair', 'Good', 'Very Good', 'Premium', 'Ideal'))
 colnames(diamonds)[1] = "ID"
 colnames(diamonds)
 summary(diamonds)
@@ -46,19 +51,23 @@ summary(diamonds)
 
 
 
+## Diamonds $10000+
 
-# Diamonds $10000+
 
 ```{r d10kp summary, results = T}
 diamonds10kplus = subset(diamonds, price > 10000)
 xkablesummary(diamonds10kplus, title = "Summary of Diamonds Over 10,000$")
 ```
 
+### Categorical Data Exploration
+
 ```{r d10kp categorical variables}
 barplot(table(diamonds10kplus$cut), col = c(2, 3, 4, 7, 6), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
 barplot(table(diamonds10kplus$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
 barplot(table(diamonds10kplus$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplot of Clarity', xlab = "Clarity", ylab = "Frequency")
 ```
+
+### Numerical Data Exploration
 
 ```{r d10kp numerical variables}
 loadPkg("ggplot2")
@@ -91,6 +100,7 @@ ggplot(diamonds10kplus, aes(y=carat)) +
   labs(title = 'Boxplot of Carat')
 ```
 
+### Price Exploration
 
 ```{r d10kp price}
 ggplot(diamonds10kplus, aes(y=price)) + 
@@ -102,6 +112,45 @@ qqnorm(diamonds10kplus$price, main="Q-Q plot of Price", col = 'blue', ylab = 'Pr
 qqline(diamonds10kplus$price)
 ```
 
-```{r d10kp price and categorical}
+### Caterogical Variables Against Price
 
+```{r d10kp price and categorical, results = 'markup'}
+anovaRes1 = aov(price ~ cut, data=diamonds10kplus)
+xkabledply(anovaRes1, title = "Cut vs Price ANOVA result summary")
+anovaRes2 = aov(price ~ clarity, data=diamonds10kplus)
+xkabledply(anovaRes2, title = "Clarity vs Price ANOVA result summary")
+anovaRes3 = aov(price ~ color, data=diamonds10kplus)
+xkabledply(anovaRes3, title = "Color vs Price ANOVA result summary")
 ```
+
+```{r d10kp pandc2, results = 'markup'}
+tukeyd10kAOV1 = TukeyHSD(anovaRes1)
+tukeyd10kAOV1
+par(mar=c(5,10,2,2))
+plot(TukeyHSD(anovaRes1, conf.level=.95), las = 2)
+tukeyd10kAOV2 = TukeyHSD(anovaRes2)
+tukeyd10kAOV2
+par(mar=c(5,10,2,2))
+plot(TukeyHSD(anovaRes2, conf.level=.95), las = 2)
+tukeyd10kAOV3 = TukeyHSD(anovaRes3)
+tukeyd10kAOV3
+par(mar=c(5,10,2,2))
+plot(TukeyHSD(anovaRes3, conf.level=.95), las = 2)
+```
+```{r d10kp pandc3}
+ggplot(diamonds10kplus, aes(x=cut, y=price)) + 
+  geom_boxplot(colour = 'black', fill= c(2, 3, 4, 7, 6)) +
+  labs(title="Price Versus Cut", x="Cut", y = "Price")
+
+ggplot(diamonds10kplus, aes(x=color, y=price)) + 
+  geom_boxplot(colour = 'black', fill=c(2, 3, 4, 7, 6, 8, 5)) +
+  labs(title="Price Versus Cut", x="Cut", y = "Price")
+
+ggplot(diamonds10kplus, aes(x=clarity, y=price)) + 
+  geom_boxplot(colour = 'black', fill=c(2, 3, 4, 7, 6, 8, 5, 2)) +
+  labs(title="Price Versus Cut", x="Cut", y = "Price")
+```
+
+
+### NUmeric Variables Against Price
+
