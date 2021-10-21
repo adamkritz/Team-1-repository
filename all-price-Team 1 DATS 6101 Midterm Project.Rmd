@@ -48,3 +48,47 @@ colnames(diamonds)[1] = "ID"
 colnames(diamonds)
 summary(diamonds)
 ```
+
+## Diamonds of all price
+
+### Distribution of each variables
+
+#### price
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
