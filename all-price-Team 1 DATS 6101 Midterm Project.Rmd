@@ -121,21 +121,20 @@ qqline(diamonds$depth)
 ```
 
 
-
+#### cut
 ```{r}
+barplot(table(diamonds$cut), col = c(2, 3, 4, 7, 6), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
+```
 
-
+#### color
+```{r}
+barplot(table(diamonds$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
 ```
 
 
+#### clarity
 ```{r}
-
-
-```
-
-```{r}
-
-
+barplot(table(diamonds$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplot of Color', xlab = "Clarity", ylab = "Frequency")
 ```
 
 ```{r}
