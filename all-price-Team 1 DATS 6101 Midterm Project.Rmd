@@ -55,15 +55,37 @@ summary(diamonds)
 
 #### price
 ```{r}
-
+library(ggplot2)
+# histogram
+p = ggplot(diamonds,aes(x=price)) + 
+  geom_histogram(breaks = seq(300,18900,100),fill = "red",color = "black",alpha = 0.3) + labs(title = "Distribution of Price", x = "Price",y = "frequency")
+p  + theme_bw()
+# boxplot
+p = ggplot(diamonds,aes(y=price)) + 
+  geom_boxplot(colour="orange", fill="#7777cc", outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Price")
+p + theme_bw() + theme(panel.grid=element_blank())
+# QQ-plot
+qqnorm(diamonds$price, main="Q-Q plot of Price", col = 'blue', ylab = 'Price') 
+qqline(diamonds$price)
 
 ```
 
 
-
+#### carat
 ```{r}
-
-
+# histogram
+p = ggplot(diamonds,aes(x=carat)) + 
+  geom_histogram(breaks = seq(0.2,5.1,0.1),fill = "red",color = "black",alpha = 0.3) + labs(title = "Distribution of Carat", x = "Carat",y = "frequency")
+p  + theme_bw()
+# boxplot
+p = ggplot(diamonds,aes(y=carat)) + 
+  geom_boxplot(colour="orange", fill="#7777cc", outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Carat")
+p + theme_bw() + theme(panel.grid=element_blank())
+# QQ-plot
+qqnorm(diamonds$carat, main="Q-Q plot of Carat", col = 'blue', ylab = 'Carat') 
+qqline(diamonds$carat)
 ```
 
 
