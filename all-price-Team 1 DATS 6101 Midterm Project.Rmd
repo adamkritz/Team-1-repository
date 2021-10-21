@@ -140,7 +140,7 @@ barplot(table(diamonds$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplo
 
 ### Relationship between variables  
 
-#### what variable effects price ?  
+#### SMART:what variable effects price ?  
 ```{r}
 # matrix and corrplot
 diamonds_num = diamonds[,c(2,6,7,8,9,10,11)]
