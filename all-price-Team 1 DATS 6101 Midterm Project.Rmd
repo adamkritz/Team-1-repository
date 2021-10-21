@@ -88,10 +88,20 @@ qqnorm(diamonds$carat, main="Q-Q plot of Carat", col = 'blue', ylab = 'Carat')
 qqline(diamonds$carat)
 ```
 
-
+#### table
 ```{r}
-
-
+# histogram
+p = ggplot(diamonds,aes(x=table)) + 
+  geom_histogram(breaks = seq(42,96,1),fill = "red",color = "black",alpha = 0.3) + labs(title = "Distribution of Table", x = "Table",y = "frequency")
+p  + theme_bw()
+# boxplot
+p = ggplot(diamonds,aes(y=table)) + 
+  geom_boxplot(colour="orange", fill="#7777cc", outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Table")
+p + theme_bw() + theme(panel.grid=element_blank())
+# QQ-plot
+qqnorm(diamonds$table, main="Q-Q plot of Table", col = 'blue', ylab = 'Table') 
+qqline(diamonds$table)
 ```
 
 
