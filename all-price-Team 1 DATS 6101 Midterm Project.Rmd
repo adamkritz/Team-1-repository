@@ -104,12 +104,20 @@ qqnorm(diamonds$table, main="Q-Q plot of Table", col = 'blue', ylab = 'Table')
 qqline(diamonds$table)
 ```
 
-
-
-
+#### depth
 ```{r}
-
-
+# histogram
+p = ggplot(diamonds,aes(x=depth)) + 
+  geom_histogram(breaks = seq(43,79,0.5),fill = "red",color = "black",alpha = 0.3) + labs(title = "Distribution of Depth", x = "depth",y = "frequency")
+p  + theme_bw()
+# boxplot
+p = ggplot(diamonds,aes(y=depth)) + 
+  geom_boxplot(colour="orange", fill="#7777cc", outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Depth")
+p + theme_bw() + theme(panel.grid=element_blank())
+# QQ-plot
+qqnorm(diamonds$depth, main="Q-Q plot of Depth", col = 'blue', ylab = 'Depth') 
+qqline(diamonds$depth)
 ```
 
 
