@@ -56,6 +56,7 @@ summary(diamonds)
 #### price  
 ```{r}
 library(ggplot2)
+library(ezids)
 # histogram
 p = ggplot(diamonds,aes(x=price)) + 
   geom_histogram(breaks = seq(300,18900,100),fill = "red",color = "black",alpha = 0.3) + labs(title = "Distribution of Price", x = "Price",y = "frequency")
@@ -141,8 +142,12 @@ barplot(table(diamonds$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplo
 
 #### what variable effects price ?  
 ```{r}
-
-
+# matrix and corrplot
+diamonds_num = diamonds[,c(2,6,7,8,9,10,11)]
+mtx_num = cor(diamonds_num)
+xkabledply(mtx_num,title = "Matrix of All Numerical Variables")
+library("corrplot")
+corrplot(mtx_num,method = "square", type="upper")
 ```
 
 
