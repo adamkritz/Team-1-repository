@@ -22,9 +22,9 @@ output:
 library(ezids)
 ```
 
-# Midterm Project
+# Midterm Project  
 
-## Importing the Data
+## Importing the Data  
 
 ```{r setup, include=FALSE}
 # some of common options (and the defaults) are: 
@@ -49,11 +49,11 @@ colnames(diamonds)
 summary(diamonds)
 ```
 
-## Diamonds of all price
+## Diamonds of all price  
 
-### Distribution of each variables
+### Distribution of each variables  
 
-#### price
+#### price  
 ```{r}
 library(ggplot2)
 # histogram
@@ -72,7 +72,7 @@ qqline(diamonds$price)
 ```
 
 
-#### carat
+#### carat  
 ```{r}
 # histogram
 p = ggplot(diamonds,aes(x=carat)) + 
@@ -88,7 +88,7 @@ qqnorm(diamonds$carat, main="Q-Q plot of Carat", col = 'blue', ylab = 'Carat')
 qqline(diamonds$carat)
 ```
 
-#### table
+#### table  
 ```{r}
 # histogram
 p = ggplot(diamonds,aes(x=table)) + 
@@ -104,7 +104,7 @@ qqnorm(diamonds$table, main="Q-Q plot of Table", col = 'blue', ylab = 'Table')
 qqline(diamonds$table)
 ```
 
-#### depth
+#### depth  
 ```{r}
 # histogram
 p = ggplot(diamonds,aes(x=depth)) + 
@@ -121,22 +121,25 @@ qqline(diamonds$depth)
 ```
 
 
-#### cut
+#### cut  
 ```{r}
 barplot(table(diamonds$cut), col = c(2, 3, 4, 7, 6), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
 ```
 
-#### color
+#### color  
 ```{r}
 barplot(table(diamonds$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
 ```
 
 
-#### clarity
+#### clarity  
 ```{r}
 barplot(table(diamonds$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplot of Color', xlab = "Clarity", ylab = "Frequency")
 ```
 
+### Relationship between variables  
+
+#### what variable effects price ?  
 ```{r}
 
 
