@@ -1,6 +1,6 @@
 ---
 title: "Team 1 Mid-term Project"
-author: "Team 1 (Names: Adam Kritz; Huang He..."
+author: "Team 1 (Names: Adam Kritz..."
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -47,3 +47,4 @@ diamonds$cut = factor(diamonds$cut, order=T, levels = c('Fair', 'Good', 'Very Go
 colnames(diamonds)[1] = "ID"
 colnames(diamonds)
 summary(diamonds)
+```
