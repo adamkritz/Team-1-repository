@@ -1,6 +1,6 @@
 ---
 title: "Team 1 Mid-term Project"
-author: "Team 1 (Names: Adam Kritz..."
+author: "Team 1 (Names: Adam Kritz; Huang He..."
 date: "`r Sys.Date()`"
 output:
   html_document:
