@@ -154,3 +154,226 @@ ggplot(diamonds10kplus, aes(x=clarity, y=price)) +
 
 ### NUmeric Variables Against Price
 
+
+
+
+
+## Diamonds Under $1000
+
+```{r}
+diamonds1kminus = subset(diamonds, price < 1000)
+xkablesummary(diamonds1kminus, title = "Summary of Diamonds Under 1,000$")
+```
+
+
+### Distribution of each variables  
+
+#### price  
+```{r}
+# histogram
+p = ggplot(diamonds1kminus,aes(x=price)) + 
+  geom_histogram(breaks = seq(300,18900,100),fill = "red",color = "grey",alpha = 0.3) + labs(title = "Distribution of Price", x = "Price",y = "frequency")
+p  + theme_bw()
+# boxplot
+p = ggplot(diamonds1kminus,aes(y=price)) + 
+  geom_boxplot(colour="orange", fill="#7777cc", outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Price")
+p + theme_bw() + theme(panel.grid=element_blank())
+# QQ-plot
+qqnorm(diamonds1kminus$price, main="Q-Q plot of Price", col = 'blue', ylab = 'Price') 
+qqline(diamonds1kminus$price)
+
+```
+
+
+#### carat  
+```{r}
+# histogram
+p = ggplot(diamonds1kminus,aes(x=carat)) + 
+  geom_histogram(breaks = seq(0.2,5.1,0.1),fill = "red",color = "black",alpha = 0.3) + labs(title = "Distribution of Carat", x = "Carat",y = "frequency")
+p  + theme_bw()
+# boxplot
+p = ggplot(diamonds1kminus,aes(y=carat)) + 
+  geom_boxplot(colour="orange", fill="#7777cc", outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Carat")
+p + theme_bw() + theme(panel.grid=element_blank())
+# QQ-plot
+qqnorm(diamonds1kminus$carat, main="Q-Q plot of Carat", col = 'blue', ylab = 'Carat') 
+qqline(diamonds1kminus$carat)
+```
+
+#### table  
+```{r}
+# histogram
+p = ggplot(diamonds1kminus,aes(x=table)) + 
+  geom_histogram(breaks = seq(42,96,1),fill = "red",color = "black",alpha = 0.3) + labs(title = "Distribution of Table", x = "Table",y = "frequency")
+p  + theme_bw()
+# boxplot
+p = ggplot(diamonds1kminus,aes(y=table)) + 
+  geom_boxplot(colour="orange", fill="#7777cc", outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Table")
+p + theme_bw() + theme(panel.grid=element_blank())
+# QQ-plot
+qqnorm(diamonds1kminus$table, main="Q-Q plot of Table", col = 'blue', ylab = 'Table') 
+qqline(diamonds1kminus$table)
+```
+
+#### depth  
+```{r}
+# histogram
+p = ggplot(diamonds1kminus,aes(x=depth)) + 
+  geom_histogram(breaks = seq(43,79,0.5),fill = "red",color = "black",alpha = 0.3) + labs(title = "Distribution of Depth", x = "depth",y = "frequency")
+p  + theme_bw()
+# boxplot
+p = ggplot(diamonds1kminus,aes(y=depth)) + 
+  geom_boxplot(colour="orange", fill="#7777cc", outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Depth")
+p + theme_bw() + theme(panel.grid=element_blank())
+# QQ-plot
+qqnorm(diamonds1kminus$depth, main="Q-Q plot of Depth", col = 'blue', ylab = 'Depth') 
+qqline(diamonds1kminus$depth)
+```
+
+
+#### cut  
+```{r}
+barplot(table(diamonds1kminus$cut), col = c(2, 3, 4, 7, 6), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
+```
+
+#### color  
+```{r}
+barplot(table(diamonds1kminus$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
+```
+
+
+#### clarity  
+```{r}
+barplot(table(diamonds1kminus$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplot of Color', xlab = "Clarity", ylab = "Frequency")
+```
+
+### Relationship between variables  
+
+#### SMART:what variable effects price ?  
+```{r results='markup'}
+# matrix and corrplot
+diamonds1kminus_num = diamonds1kminus[,c(2,6,7,8,9,10,11)]
+mtx_num = cor(diamonds1kminus_num)
+xkabledply(mtx_num,title = "Matrix of All Numerical Variables")
+library("corrplot")
+corrplot(mtx_num,method = "square", type="upper")
+```
+
+#SMART: Does cut methods effect price?  
+```{r}
+p = ggplot(diamonds1kminus,aes(x = cut,y=price)) + 
+  geom_boxplot(colour="grey", fill=c(2, 3, 4, 7, 6), outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Price in Different Cut methods")
+p + theme_bw() + theme(panel.grid=element_blank())
+anv_pri_cut = aov(price ~ cut,data = diamonds1kminus)
+xkabledply(anv_pri_cut,title = "Cut vs Price ANOVA result summary")
+
+```
+
+```{r results='markup'}
+tukey_pri_cut <- TukeyHSD(anv_pri_cut)
+tukey_pri_cut
+```
+Diamonds1kminus with different cut methods do have different price averages.  
+
+#SMART: Does clarity levels effect price?  
+```{r}
+p = ggplot(diamonds1kminus,aes(x = clarity,y=price)) + 
+  geom_boxplot(colour="orange", fill=c(2, 3, 4, 7, 6 ,5 ,8 ,9), outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Price in Different Clarity levels")
+p + theme_bw() + theme(panel.grid=element_blank())
+anv_pri_cla = aov(price ~ clarity,data = diamonds1kminus)
+xkabledply(anv_pri_cla,title = "Clarity vs Price ANOVA result summary")
+```
+
+```{r results='markup'}
+tukey_pri_cla <- TukeyHSD(anv_pri_cla)
+tukey_pri_cla
+```
+Diamonds1kminus in different clarity levels do have different price averages.  
+
+#SMART: Does color effect price?  
+```{r}
+p = ggplot(diamonds1kminus,aes(x = color,y=price)) + 
+  geom_boxplot(colour="orange", fill=c(2, 3, 4, 7, 6 ,5 ,8 ), outlier.colour="red", outlier.shape=8, outlier.size=4) + 
+  labs(title = "Distribution of Price in Different Color")
+p + theme_bw() + theme(panel.grid=element_blank())
+anv_pri_col = aov(price ~ color,data = diamonds1kminus)
+xkabledply(anv_pri_col,title = "Clarity vs Price ANOVA result summary")
+```
+
+
+```{r results='markup'}
+tukey_pri_col <- TukeyHSD(anv_pri_col)
+tukey_pri_col
+```
+
+Diamonds1kminus in different clarity levels do have different price averages.  
+
+
+#### what variable effects cutting methods?  
+
+#SMART: Do different ranks of color have different cutting methods?  
+
+```{r results='markup'}
+tab_cut_col = table(diamonds1kminus$color,diamonds1kminus$cut)
+chitest = chisq.test(tab_cut_col)
+chitest
+```
+
+```{r}
+names = colnames(tab_cut_col)
+cols = c("#ED1C24","#22B14C","#FFC90E","#3f48CC","pink")
+piepercent_d = paste(names,":",round(100*tab_cut_col[1,]/sum(tab_cut_col[1,])), "%")
+piepercent_e = paste(names,":",round(100*tab_cut_col[2,]/sum(tab_cut_col[2,])), "%")
+piepercent_f = paste(names,":",round(100*tab_cut_col[3,]/sum(tab_cut_col[3,])), "%")
+piepercent_g = paste(names,":",round(100*tab_cut_col[4,]/sum(tab_cut_col[4,])), "%")
+piepercent_h = paste(names,":",round(100*tab_cut_col[5,]/sum(tab_cut_col[5,])), "%")
+piepercent_i = paste(names,":",round(100*tab_cut_col[6,]/sum(tab_cut_col[6,])), "%")
+piepercent_j = paste(names,":",round(100*tab_cut_col[7,]/sum(tab_cut_col[7,])), "%")
+par(mfrow=c(2,2))
+pie(tab_cut_col[1,], labels=piepercent_d, main = "D rank of color", col=cols)
+pie(tab_cut_col[2,], labels=piepercent_e, main = "E rank of color", col=cols)
+pie(tab_cut_col[3,], labels=piepercent_f, main = "F rank of color", col=cols)
+pie(tab_cut_col[4,], labels=piepercent_g, main = "G rank of color", col=cols)
+pie(tab_cut_col[5,], labels=piepercent_h, main = "H rank of color", col=cols)
+pie(tab_cut_col[6,], labels=piepercent_i, main = "I rank of color", col=cols)
+pie(tab_cut_col[7,], labels=piepercent_j, main = "J rank of color", col=cols)
+```
+Different ranks of color have different cutting methods.  
+
+
+
+#SMART: Do different ranks of clarity have different cutting methods?  
+```{r results='markup'}
+tab_cut_cla = table(diamonds1kminus$clarity,diamonds1kminus$cut)
+chitest = chisq.test(tab_cut_cla)
+chitest
+```
+
+```{r}
+names = colnames(tab_cut_cla)
+cols = c("#ED1C24","#22B14C","#FFC90E","#3f48CC","pink")
+piepercent_1 = paste(names,":",round(100*tab_cut_cla[1,]/sum(tab_cut_cla[1,])), "%")
+piepercent_2 = paste(names,":",round(100*tab_cut_cla[2,]/sum(tab_cut_cla[2,])), "%")
+piepercent_3 = paste(names,":",round(100*tab_cut_cla[3,]/sum(tab_cut_cla[3,])), "%")
+piepercent_4 = paste(names,":",round(100*tab_cut_cla[4,]/sum(tab_cut_cla[4,])), "%")
+piepercent_5 = paste(names,":",round(100*tab_cut_cla[5,]/sum(tab_cut_cla[5,])), "%")
+piepercent_6 = paste(names,":",round(100*tab_cut_cla[6,]/sum(tab_cut_cla[6,])), "%")
+piepercent_7 = paste(names,":",round(100*tab_cut_cla[7,]/sum(tab_cut_cla[7,])), "%")
+piepercent_8 = paste(names,":",round(100*tab_cut_cla[8,]/sum(tab_cut_cla[8,])), "%")
+par(mfrow=c(2,2))
+pie(tab_cut_cla[1,], labels=piepercent_1, main = "I1 rank of color", col=cols)
+pie(tab_cut_cla[2,], labels=piepercent_2, main = "SI2 rank of color", col=cols)
+pie(tab_cut_cla[3,], labels=piepercent_3, main = "SI1 rank of color", col=cols)
+pie(tab_cut_cla[4,], labels=piepercent_4, main = "VS2 rank of color", col=cols)
+pie(tab_cut_cla[5,], labels=piepercent_5, main = "VS1 rank of color", col=cols)
+pie(tab_cut_cla[6,], labels=piepercent_6, main = "VVS2 rank of color", col=cols)
+pie(tab_cut_cla[7,], labels=piepercent_7, main = "VVS1 rank of color", col=cols)
+pie(tab_cut_cla[8,], labels=piepercent_8, main = "IF rank of color", col=cols)
+```
+Different ranks of clarity have different cutting methods.  
