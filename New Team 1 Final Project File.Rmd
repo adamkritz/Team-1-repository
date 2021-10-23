@@ -47,3 +47,27 @@ diamonds$cut = factor(diamonds$cut, order=T, levels = c('Fair', 'Good', 'Very Go
 colnames(diamonds)[1] = "ID"
 colnames(diamonds)
 summary(diamonds)
+```
+
+## EDA section - Adam
+
+```{r}
+```
+
+
+
+## caterigocal affect on price - Solomon
+
+```{r}
+```
+
+## continious variable affect on price - Suhas
+
+
+```{r}
+```
+
+## categorical variable affect on cut - Huang
+
+```{r}
+```
