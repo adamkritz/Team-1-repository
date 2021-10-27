@@ -65,10 +65,13 @@ summary(diamonds)
 
 
 ```{r}
+# Creating a subset of continuous variables, calculating the correlation matrix and making the corrplot to identify the strongest relationships between continuous variables.
+
 diamonds_continuous = subset(diamonds, select = c("carat", "depth", "table", "price", "x", "y", "z"))
 loadPkg("corrplot")
 diamonds_continuous_cor= cor(diamonds_continuous)
 corrplot(diamonds_continuous_cor, method= "number")
+
 ```
 
 ## categorical variable affect on cut - Huang
