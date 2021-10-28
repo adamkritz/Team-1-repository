@@ -171,5 +171,8 @@ corrplot(diamonds_continuous_cor, method= "number")
 
 ## categorical variable affect on cut - Huang
 
-```{r}
+### Clarity VS Cut
+```{r results='markup'}
+tab_cut_cla = table(diamonds$clarity,diamonds$cut)
+xkabledply(tab_cut_cla,title = "Statistics Table of Clarity VS Cut")
 ```
