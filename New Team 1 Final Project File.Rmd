@@ -61,7 +61,7 @@ xkablesummary(diamonds, title = "Summary of Diamonds")
 ### Categorical Data Exploration
 
 ```{r categorical variables}
-barplot(table(diamonds$cut), col = c(2, 3, 4, 7, 6), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
+barplot(table(diamonds$cut), col = c(6, 7, 8, 3, 4), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
 barplot(table(diamonds$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
 barplot(table(diamonds$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplot of Clarity', xlab = "Clarity", ylab = "Frequency")
 
@@ -108,20 +108,20 @@ ggplot(diaNO, aes(x, y, color=z)) +
 
 ggplot(diamonds, aes(y=table)) + 
   geom_histogram(col="black", 
-                 fill="red", 
+                 fill="green", 
                   alpha = .8,
                  binwidth = 1.5) +
-  labs(title='Barplot of Table') +
+  labs(title='Histogram of Table') +
   coord_flip() +
   labs(y="Table", x="Frequency")
 
 ggplot(diamonds, aes(y=depth)) + 
   geom_histogram(col="black", 
-                 fill="green", 
+                 fill="red", 
                   alpha = .8,
                  binwidth = 1) +
   coord_flip() +
-  labs(title='Barplot of Depth') +
+  labs(title='Histogram of Depth') +
   labs(y="Depth", x="Frequency")
 
 ggplot(diamonds, aes(y=carat)) + 
@@ -136,7 +136,7 @@ ggplot(diamonds, aes(y=carat)) +
 ```{r d10kp price}
 ggplot(diamonds, aes(y=price)) + 
   geom_boxplot() + 
-  geom_boxplot(colour="black", fill="blue", outlier.colour="blue", outlier.size=1, alpha = 0.8) +
+  geom_boxplot(colour="black", fill="blue", outlier.colour="blue", outlier.size=5, alpha = 0.8) +
   labs(title = 'Boxplot of Price')
 
 ggplot(diamonds, aes(y=price)) + 
@@ -145,7 +145,7 @@ ggplot(diamonds, aes(y=price)) +
                   alpha = .8,
                  binwidth = 300) +
   coord_flip() +
-  labs(title='Barplot of Price') +
+  labs(title='Histogram of Price') +
   labs(y="Price", x="Frequency")
 
 qqnorm(diamonds$price, main="Q-Q plot of Price", col = 'blue', ylab = 'Price') 
