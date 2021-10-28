@@ -57,12 +57,6 @@ summary(diamonds)
 xkablesummary(diamonds, title = "Summary of Diamonds")
 ```
 
-### diamonds categorical text summaries
-
-```{r categorical variables text}
-
-```
-
 
 ### Categorical Data Exploration
 
@@ -70,12 +64,32 @@ xkablesummary(diamonds, title = "Summary of Diamonds")
 barplot(table(diamonds$cut), col = c(2, 3, 4, 7, 6), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
 barplot(table(diamonds$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
 barplot(table(diamonds$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplot of Clarity', xlab = "Clarity", ylab = "Frequency")
+
+cut_count = dplyr::count(diamonds, cut)
+colnames(cut_count)[colnames(cut_count) == 'cut'] <- 'Cut'
+cut_count$n = cut_count$n/sum(cut_count$n)
+
+ggplot(cut_count, aes(x = "", y = n, fill = Cut)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  geom_text(size = 4, aes(label = paste0(round(n, 2), "%")), position = position_stack(vjust = 0.5))+
+  scale_fill_manual(values = c(6, 7, 8, 3, 4))
 ```
 
 ### diamonds numerical text summaries
 
 ```{r numerical variables text}
+mean(diamonds$depth)
+sd(diamonds$depth)
 
+mean(diamonds$table)
+sd(diamonds$table)
+
+mean(diamonds$carat)
+sd(diamonds$carat)
+
+mean(diamonds$price)
+sd(diamonds$price)
 ```
 
 ### Numerical Data Exploration
@@ -95,20 +109,23 @@ ggplot(diamonds, aes(y=table)) +
                   alpha = .8,
                  binwidth = 1.5) +
   labs(title='Barplot of Table') +
+  coord_flip() +
   labs(y="Table", x="Frequency")
 
 ggplot(diamonds, aes(y=depth)) + 
   geom_histogram(col="black", 
                  fill="green", 
                   alpha = .8,
-                 binwidth = 1.5) +
+                 binwidth = 1) +
+  coord_flip() +
   labs(title='Barplot of Depth') +
   labs(y="Depth", x="Frequency")
 
 ggplot(diamonds, aes(y=carat)) + 
   geom_boxplot() + 
-  geom_boxplot(colour="black", fill="yellow", outlier.colour="yellow", outlier.size=3, alpha = 0.8) +
-  labs(title = 'Boxplot of Carat')
+  geom_boxplot(colour="black", fill="yellow", outlier.colour="orange", outlier.size=5, alpha = 0.8) +
+  labs(title = 'Boxplot of Carat')+
+  labs(y="Carat")
 ```
 
 ### Price Exploration
@@ -124,6 +141,7 @@ ggplot(diamonds, aes(y=price)) +
                  fill="blue", 
                   alpha = .8,
                  binwidth = 300) +
+  coord_flip() +
   labs(title='Barplot of Price') +
   labs(y="Price", x="Frequency")
 
