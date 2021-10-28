@@ -69,11 +69,15 @@ cut_count = dplyr::count(diamonds, cut)
 colnames(cut_count)[colnames(cut_count) == 'cut'] <- 'Cut'
 cut_count$n = cut_count$n/sum(cut_count$n)
 
+loadPkg("ggplot2")
+
 ggplot(cut_count, aes(x = "", y = n, fill = Cut)) +
   geom_bar(stat="identity", width=1) +
   coord_polar("y", start=0) +
   geom_text(size = 4, aes(label = paste0(round(n, 2), "%")), position = position_stack(vjust = 0.5))+
-  scale_fill_manual(values = c(6, 7, 8, 3, 4))
+  scale_fill_manual(values = c(6, 7, 8, 3, 4))+
+  labs(title='Pie Chart of Cut')
+  
 ```
 
 ### diamonds numerical text summaries
@@ -95,7 +99,6 @@ sd(diamonds$price)
 ### Numerical Data Exploration
 
 ```{r numerical variables}
-loadPkg("ggplot2")
 # removed weird outliers, note in slides
 diaNO = subset(diamonds, x > 0 & y > 0 & z > 0 & y <30 & z <30)
 ggplot(diaNO, aes(x, y, color=z)) +
@@ -123,7 +126,7 @@ ggplot(diamonds, aes(y=depth)) +
 
 ggplot(diamonds, aes(y=carat)) + 
   geom_boxplot() + 
-  geom_boxplot(colour="black", fill="yellow", outlier.colour="orange", outlier.size=5, alpha = 0.8) +
+  geom_boxplot(colour="black", fill="orange", outlier.colour="orange", outlier.size=5, alpha = 0.8) +
   labs(title = 'Boxplot of Carat')+
   labs(y="Carat")
 ```
