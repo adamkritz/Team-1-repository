@@ -234,8 +234,8 @@ pie(tab_cut_col[7,], labels=piepercent_j, main = "J rank of color", col=cols)
 ```
 
 
-```{r}
-chitest_cut_col = chisq.test(tab_cut_cla)
+```{r results='markup'}
+chitest_cut_col = chisq.test(tab_cut_col)
 chitest_cut_col
 ```
 
