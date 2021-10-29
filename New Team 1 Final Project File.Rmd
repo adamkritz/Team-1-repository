@@ -169,6 +169,53 @@ corrplot(diamonds_continuous_cor, method= "number")
 
 ```
 
+```{r}
+fit1 <- lm(price ~ carat, data = diamonds)
+summary(fit1)
+
+xkabledply(fit1, title = paste("Model :", format(formula(fit1)) ) )
+
+
+
+```
+```{r}
+fit2 <- lm(price ~ carat+x, data = diamonds)
+
+
+xkabledply(fit2, title = paste("Model :", format(formula(fit2)) ) )
+xkablevif(fit2)
+summary(fit2)
+
+```
+```{r}
+fit3 <- lm(price ~ carat+x+y, data = diamonds)
+
+
+xkabledply(fit3, title = paste("Model :", format(formula(fit3)) ) )
+xkablevif(fit3)
+summary(fit3)
+
+```
+
+```{r}
+fit4 <- lm(price ~ carat+x+y+z, data = diamonds)
+
+
+xkabledply(fit4, title = paste("Model :", format(formula(fit4)) ) )
+xkablevif(fit4)
+summary(fit4)
+
+```
+```{r}
+fit5 <- lm(price ~ carat+x+y+z+table, data = diamonds)
+
+
+xkabledply(fit5, title = paste("Model :", format(formula(fit5)) ) )
+xkablevif(fit5)
+summary(fit5)
+
+```
+
 ## categorical variable affect on cut - Huang
 
 ### Clarity VS Cut
