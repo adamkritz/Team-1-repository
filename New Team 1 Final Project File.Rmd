@@ -178,6 +178,37 @@ xkabledply(fit1, title = paste("Model :", format(formula(fit1)) ) )
 
 
 ```
+
+```{r}
+fit1a <- lm(price ~ x, data = diamonds)
+summary(fit1a)
+
+xkabledply(fit1a, title = paste("Model :", format(formula(fit1a)) ) )
+
+
+
+```
+
+```{r}
+fit1b <- lm(price ~ y, data = diamonds)
+summary(fit1b)
+
+xkabledply(fit1b, title = paste("Model :", format(formula(fit1b)) ) )
+
+
+
+```
+
+```{r}
+fit1c <- lm(price ~ z, data = diamonds)
+summary(fit1c)
+
+xkabledply(fit1c, title = paste("Model :", format(formula(fit1c)) ) )
+
+
+
+```
+
 ```{r}
 fit2 <- lm(price ~ carat+x, data = diamonds)
 
@@ -187,6 +218,7 @@ xkablevif(fit2)
 summary(fit2)
 
 ```
+
 ```{r}
 fit3 <- lm(price ~ carat+x+y, data = diamonds)
 
@@ -206,6 +238,7 @@ xkablevif(fit4)
 summary(fit4)
 
 ```
+
 ```{r}
 fit5 <- lm(price ~ carat+x+y+z+table, data = diamonds)
 
