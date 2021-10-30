@@ -156,6 +156,170 @@ qqline(diamonds$price)
 ## caterigocal affect on price - Solomon
 
 
+### **Diamond CUT**
+
+The Diamonds data set have five `cut` types with the  highest superscript indicating the best: 
+
+   Fair^1^ | Good^2^ | Very Good^3^ | Premium^4^ | Ideal^5^
+   
+```{r, results='hide'}
+
+diamonds_outliers_removed<- outlierKD2(diamonds,price, TRUE,FALSE, FALSE, FALSE)
+```
+
+
+```{r,results='markup'}
+# any(is.na.data.frame(diamonds)) colSums(is.na(diamonds))
+cut <- subset(diamonds,select=c(cut))
+xkabledply(table(cut),title = "Distinct Count of Cut Type",wide=TRUE)
+barplot(table(cut),main = "Bar Plot on Diamonds Cut Type",xlab = "Cut",ylab = "Cut_frequency", col=rainbow(5))
+
+```
+
+It is noticed from the bar plot that most of the customers went for the `Ideal` Diamond cut which is `100%` from the cut scale (20% for each level of cut grade). 
+
+```{r,results = "markup"}
+ggplot(diamonds,aes(x=cut,y=price,fill=cut))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamonds Cut")
+
+
+ggplot(diamonds_outliers_removed,aes(x=cut,y=price,fill=cut))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamonds Cut (Outliers Minimized)")
+
+
+caov <- aov(diamonds_outliers_removed$price~cut,data = diamonds_outliers_removed)
+```
+
+It can be noticed from the box plot that the mean of Ideal cut is different from other mean cuts.
+
+
+### **ANOVA of Price and Cut**
+
+H~0~ :There is no difference in the mean price across different diamonds cut
+
+H~1~ :There is difference in the mean price across different diamonds cut
+
+```{r cutaov,results = "markup"}
+xkabledply(caov, title = "ANOVA Modelling of Price by Cut")
+```
+
+We reject H~0~ from the ANOVA test between Diamonds price and cut with p-value `2E-16` as this shows that the mean price across different diamonds cut are different.
+
+```{r, results='markup'}
+TukeyCutAoV <- TukeyHSD(caov)
+TukeyCutAoV
+
+```
+
+
+```{r,results='markup'}
+model.tables(caov,"mean")
+```
+
+We proceed to a post-hoc (Tukey HSD) test to uncover specific differences between the cut group means.
+
+Our result shows that the pairs:
+Good-Fair | Very Good-Fair | Ideal-Fair | Premium-Good | Ideal-Good | Premium-Very Good | Ideal-Very Good | Ideal-Premium are significant with a p-value less than 0.05.
+
+We can also infer that it is very likely (significant) for customers to purchase diamonds with `fair`, `Good`, `Very Good`, `Premium` cut than `Ideal` cut type.
+
+### **Diamond COLOR**
+
+The Diamonds data set have seven `color` grades with the  highest superscript indicating the best: 
+  
+  D^1^ | E^2^ | F^3^ | G^4^ | H^5^ | I^6^ | J^7^
+
+```{r,results='markup'}
+color<- subset(diamonds,select = c(color))
+xkabledply((table(color)),title = "Distinct Count of Diamond's Color Grade",wide=TRUE)
+barplot(table(color),main = "Bar Plot on Diamonds Color Grade",xlab = "Color (grade)",ylab = "Color_frequency", col=rainbow(7))
+```
+
+It is noticed from the bar plot that most of the customers went for the `G` Diamond color grade which is about `57.14%`  from the clarity scale (~14.286% for each level of color grade). 
+
+
+```{r, results='markup'}
+ggplot(diamonds,aes(x=color,y=price,fill=color))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamonds Color")
+
+ggplot(diamonds_outliers_removed,aes(x=color,y=price,fill=color))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamonds Color (Outliers Minimized)")
+```
+
+It is noticed from the boxplot that the means of color type `F` to `J` are higher than color type `D, E`.
+
+### **ANOVA of Price and Color**
+
+H~0~ :There is no difference in the mean price across different diamonds color grade
+
+H~1~ :There is difference in the mean price across different diamonds color grade
+
+```{r,results='markup'}
+caov2<- aov(diamonds_outliers_removed$price~color, data=diamonds_outliers_removed)
+xkabledply(caov2, title = "ANOVA Modelling of Price by Color")
+```
+
+Also, we reject H~0~ the ANOVA test between Diamonds price and color with p-value `2E-16` as this shows that the mean price across different diamonds colors are different.
+
+```{r, results='markup'}
+TukeyColorAoV <- TukeyHSD(caov2)
+TukeyColorAoV
+model.tables(caov2,"mean")
+
+```
+
+From the grand means it shows that people are likely to spend more on poor colored type diamonds.
+
+The Tukey post-hoc test for color grade groups, shows that the pairs are significant with p-value less than 0.05 except for `E-D` pair.
+
+
+### **Diamond CLARITY**
+
+The Diamonds data set have eight `clarity` grades with the  highest superscript indicating the best: 
+ 
+  I1^1^ | SI2^2^ | SI1^3^ | VS2^4^ | VS1^5^ | VVS2^6^ | VVS1^7^ | IF^8^
+
+```{r, results='markup'}
+clarity<- subset(diamonds,select = c(clarity))
+xkabledply((table(clarity)),title = "Distinct Count of Diamond's clarity",wide=TRUE)
+barplot(table(clarity),main = "Bar Plot on Diamond's clarity",xlab = "clarity (grade)",ylab = "Clarity_frequency", col=rainbow(7))
+```
+
+
+It is noticed from the bar plot that most of the customers went for the `SI1` Diamond clarity type which is about `37.5%` clear from the clarity scale (12.5% for each level of clarity). 
+
+
+```{r,results='markup'}
+
+ggplot(diamonds,aes(x=clarity,y=price,fill=clarity))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamond's Clarity")
+
+ggplot(diamonds_outliers_removed,aes(x=clarity,y=price,fill=clarity))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamonds Clarity (Outliers Minimized)")
+```
+
+The boxplot above shows a very distinct variation with the mean of `SI2, I1, SI1` diamond clarity types.
+
+### **ANOVA of Price and Clarity**
+
+H~0~ :There is no difference in the mean price across different diamonds clarity
+
+H~1~ :There is difference in the mean price across different diamonds clarity
+
+```{r, results='markup'}
+caov3<- aov(diamonds_outliers_removed$price~clarity, data=diamonds_outliers_removed)
+xkabledply(caov3, title = "ANOVA Modelling of Price by Clarity")
+```
+
+We reject H~0~ from the ANOVA test between Diamonds price and clarity with p-value `2E-16` as this shows that the mean price across different diamonds clarity are different.
+
+
+```{r, results='markup'}
+TukeyClarityAoV <- TukeyHSD(caov3)
+TukeyClarityAoV
+model.tables(caov3,"mean")
+
+```
+
+The grand means also made it clear that it is more likely for customers to spend more on lower/poorer clarity diamonds.
+
+The post-hoc test made it clear that aside from these pairs SI2-I1, VS1-VS2, IF-VVS1 which are not significant; all other pairs are significantly different with p-value less than 0.05.
+
+
 ## continious variable affect on price - Suhas
 
 
