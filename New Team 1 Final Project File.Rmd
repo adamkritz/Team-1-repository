@@ -423,7 +423,7 @@ summary(fit5)
 
 ```
 
-```{r '}
+```{r}
 anova(fit1, fit2,fit3, fit4, fit5) -> anovaRes
 anovaRes
 str(anovaRes)
