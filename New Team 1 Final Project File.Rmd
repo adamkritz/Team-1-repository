@@ -230,6 +230,16 @@ summary(fit3)
 ```
 
 ```{r}
+fit3a <- lm(price ~ x+y+z, data = diamonds)
+
+
+xkabledply(fit3a, title = paste("Model :", format(formula(fit3a)) ) )
+xkablevif(fit3a)
+summary(fit3a)
+
+```
+
+```{r}
 fit4 <- lm(price ~ carat+x+y+z, data = diamonds)
 
 
@@ -246,6 +256,16 @@ fit5 <- lm(price ~ carat+x+y+z+table, data = diamonds)
 xkabledply(fit5, title = paste("Model :", format(formula(fit5)) ) )
 xkablevif(fit5)
 summary(fit5)
+
+```
+
+```{r '}
+anova(fit1, fit2,fit3, fit4, fit5) -> anovaRes
+anovaRes
+str(anovaRes)
+
+xkabledply(anovaRes, title = "ANOVA comparison between the models")
+
 
 ```
 
