@@ -561,7 +561,8 @@ Below is the statistics table of color and cutting methods. All kinds of cutting
 tab_cut_col = table(diamonds$color,diamonds$cut)
 xkabledply(tab_cut_col,title = "Statistics Table of Color VS Cut")
 ```
-
+  
+So, we draw pie charts of each rank of clarity. As the below charts shows, the percentages of each cutting methods are different in different ranks of color. Rank D is the best rank of color and rank J is the worst. Higher ranks of colors uses higher percentage of premium and ideal cutting methods.  
 
 ```{r}
 names = colnames(tab_cut_col)
@@ -582,8 +583,16 @@ pie(tab_cut_col[5,], labels=piepercent_h, main = "H rank of color", col=cols)
 pie(tab_cut_col[6,], labels=piepercent_i, main = "I rank of color", col=cols)
 pie(tab_cut_col[7,], labels=piepercent_j, main = "J rank of color", col=cols)
 ```
-
-
+  
+Also, we can turn the pie charts to one bar chart to compare the difference.  
+```{r}
+p = ggbarstats(data = diamonds, x = cut, y = color,results.subtitle = F,palette = "Set3", bar.proptest= F)
+p
+```
+  
+On the whole, In general, as the grade decreases (from D to J), the proportion of using better cutting methods is also decreasing.  
+It seems that the higher ranks of color use greater cutting methods more. 
+In order to obtain evidence to support our conclusion, we performed a Chi-squared test. The result is below. Because the p-value is too small, we have enough evidence to conclude that color of diamonds does affect the cutting methods.  
 ```{r results='markup'}
 chitest_cut_col = chisq.test(tab_cut_col)
 chitest_cut_col
