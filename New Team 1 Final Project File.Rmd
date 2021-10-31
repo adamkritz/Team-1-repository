@@ -505,8 +505,8 @@ xkabledply(anovaRes, title = "ANOVA comparison between the models")
 
 Comparing the different linear models built, we can see that variation in carat best explains the variation in price. Addition of more variables to that linear model only explains the variation in price slightly better and from the Anova test result, we can see that F statistic values is highest for the fit 2 and lower for all other models. By this we can reject all the models but fit2, since it explains the variation in price best as compared to other models.
 
-## What affects the cutting methods?- Huang
-
+## What affects the cutting methods?- Huang  
+  
 After exploring what affects the price of diamonds, we are very interested in the cutting method of the diamonds. As we all know, considering that the better the cutting method, the higher the cost, it seems that the higher the quality of the raw material, the more likely it is to adopt the perfect cutting method.  
 In this dataset, Clarity and color can represent the quality of the raw material.  
 
@@ -516,7 +516,7 @@ Below is the statistics table of clarity and cutting method. All kinds of cuttin
 tab_cut_cla = table(diamonds$clarity,diamonds$cut)
 xkabledply(tab_cut_cla,title = "Statistics Table of Clarity VS Cut")
 ```
-
+  
 So, we draw pie charts of each rank of clarity. As the below charts shows, the worst rank of clarity (I1) uses the worst cutting method (fair) the most, but the best rank of clarity (IF) uses the best cutting method (ideal) the most.  
 
 ```{r}
@@ -540,22 +540,24 @@ pie(tab_cut_cla[6,], labels=piepercent_6, main = "VVS2 rank of clarity", col=col
 pie(tab_cut_cla[7,], labels=piepercent_7, main = "VVS1 rank of clarity", col=cols)
 pie(tab_cut_cla[8,], labels=piepercent_8, main = "IF rank of clarity", col=cols)
 ```
-  
+   
 Or we can turn the pie charts to one bar chart.  
 ```{r}
 loadPkg("ggstatsplot")
 p = ggbarstats(data = diamonds, x = cut, y = clarity,results.subtitle = F,palette = "Set3", bar.proptest= F)
 p
 ```
+  
 This bar chart shows the percentages of each cutting methods in each rank of clarity. It is clear that, with the rise of clarity ranks (from I1 to IF), the percentage of ideal cutting methods continues to increase and the percentage of fair cutting methods keeps decreasing.  
 It seems that good ranks of clarity use good cutting methods.  
-In order to obtain evidence to support our conclusion, we performed a Chi-squared test. The result is below. Because the p-value is too small, we have enough evidence to conclude that clarity of diamonds does affect the cutting methods.
+In order to obtain evidence to support our conclusion, we performed a Chi-squared test. The result is below. Because the p-value is too small, we have enough evidence to conclude that clarity of diamonds does affect the cutting methods.  
 ```{r results='markup'}
 chitest_cut_cla = chisq.test(tab_cut_cla)
 chitest_cut_cla
 ```
-
+  
 ### SMART Question: Do different ranks of color have different cutting methods?  
+
 Below is the statistics table of color and cutting methods. All kinds of cutting methods are adopted in all ranks of color. But the percentage of each cutting methods may be different in different ranks of color.    
 ```{r}
 tab_cut_col = table(diamonds$color,diamonds$cut)
