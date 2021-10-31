@@ -555,8 +555,8 @@ chitest_cut_cla = chisq.test(tab_cut_cla)
 chitest_cut_cla
 ```
 
-### Color VS Cut
-
+### SMART Question: Do different ranks of color have different cutting methods?  
+Below is the statistics table of color and cutting methods. All kinds of cutting methods are adopted in all ranks of color. But the percentage of each cutting methods may be different in different ranks of color.    
 ```{r}
 tab_cut_col = table(diamonds$color,diamonds$cut)
 xkabledply(tab_cut_col,title = "Statistics Table of Color VS Cut")
