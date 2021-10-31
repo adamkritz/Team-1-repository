@@ -433,14 +433,19 @@ xkabledply(anovaRes, title = "ANOVA comparison between the models")
 
 ```
 
-## What variables affect on cut? - Huang
+## What affects the cutting method? - Huang  
 
-### Clarity VS Cut
+After exploring what affects the price of diamonds, we are very interested in the cutting method of the diamonds. As we all know, considering that the better the cutting method, the higher the cost, it seems that the higher the quality of the raw material, the more likely it is to adopt the perfect cutting method.  
+In this dataset, Clarity and color can represent the quality of the raw material.  
+
+### SMART Question: Do different ranks of clarity have different cutting methods?  
+Below is the statistics table of clarity and cutting method. All kinds of cutting methods are adopted in all ranks of clarity. But the percentage of each cutting methods may be different in different ranks of clarity.   
 ```{r results='markup'}
 tab_cut_cla = table(diamonds$clarity,diamonds$cut)
 xkabledply(tab_cut_cla,title = "Statistics Table of Clarity VS Cut")
 ```
 
+So, we draw pie charts of each 
 
 ```{r}
 names = colnames(tab_cut_cla)
@@ -454,14 +459,14 @@ piepercent_6 = paste(names,":",round(100*tab_cut_cla[6,]/sum(tab_cut_cla[6,])), 
 piepercent_7 = paste(names,":",round(100*tab_cut_cla[7,]/sum(tab_cut_cla[7,])), "%")
 piepercent_8 = paste(names,":",round(100*tab_cut_cla[8,]/sum(tab_cut_cla[8,])), "%")
 par(mfrow=c(2,2))
-pie(tab_cut_cla[1,], labels=piepercent_1, main = "I1 rank of color", col=cols)
-pie(tab_cut_cla[2,], labels=piepercent_2, main = "SI2 rank of color", col=cols)
-pie(tab_cut_cla[3,], labels=piepercent_3, main = "SI1 rank of color", col=cols)
-pie(tab_cut_cla[4,], labels=piepercent_4, main = "VS2 rank of color", col=cols)
-pie(tab_cut_cla[5,], labels=piepercent_5, main = "VS1 rank of color", col=cols)
-pie(tab_cut_cla[6,], labels=piepercent_6, main = "VVS2 rank of color", col=cols)
-pie(tab_cut_cla[7,], labels=piepercent_7, main = "VVS1 rank of color", col=cols)
-pie(tab_cut_cla[8,], labels=piepercent_8, main = "IF rank of color", col=cols)
+pie(tab_cut_cla[1,], labels=piepercent_1, main = "I1 rank of clarity", col=cols)
+pie(tab_cut_cla[2,], labels=piepercent_2, main = "SI2 rank of clarity", col=cols)
+pie(tab_cut_cla[3,], labels=piepercent_3, main = "SI1 rank of clarity", col=cols)
+pie(tab_cut_cla[4,], labels=piepercent_4, main = "VS2 rank of clarity", col=cols)
+pie(tab_cut_cla[5,], labels=piepercent_5, main = "VS1 rank of clarity", col=cols)
+pie(tab_cut_cla[6,], labels=piepercent_6, main = "VVS2 rank of clarity", col=cols)
+pie(tab_cut_cla[7,], labels=piepercent_7, main = "VVS1 rank of clarity", col=cols)
+pie(tab_cut_cla[8,], labels=piepercent_8, main = "IF rank of clarity", col=cols)
 ```
 
 ```{r}
