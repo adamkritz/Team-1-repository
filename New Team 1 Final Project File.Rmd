@@ -433,7 +433,7 @@ xkabledply(anovaRes, title = "ANOVA comparison between the models")
 
 ```
 
-## categorical variable affect on cut - Huang
+## What variables affect on cut? - Huang
 
 ### Clarity VS Cut
 ```{r results='markup'}
