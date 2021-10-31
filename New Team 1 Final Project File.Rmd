@@ -540,7 +540,7 @@ pie(tab_cut_cla[6,], labels=piepercent_6, main = "VVS2 rank of clarity", col=col
 pie(tab_cut_cla[7,], labels=piepercent_7, main = "VVS1 rank of clarity", col=cols)
 pie(tab_cut_cla[8,], labels=piepercent_8, main = "IF rank of clarity", col=cols)
 ```
-
+  
 Or we can turn the pie charts to one bar chart.  
 ```{r}
 loadPkg("ggstatsplot")
