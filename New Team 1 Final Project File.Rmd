@@ -517,7 +517,7 @@ tab_cut_cla = table(diamonds$clarity,diamonds$cut)
 xkabledply(tab_cut_cla,title = "Statistics Table of Clarity VS Cut")
 ```
 
-So, we draw pie charts of each 
+So, we draw pie charts of each rank of clarity. As the below charts shows, the worst rank of clarity (I1) uses the worst cutting method (fair) the most, but the best rank of clarity (IF) uses the best cutting method (ideal) the most.
 
 ```{r}
 names = colnames(tab_cut_cla)
