@@ -541,6 +541,8 @@ pie(tab_cut_cla[7,], labels=piepercent_7, main = "VVS1 rank of clarity", col=col
 pie(tab_cut_cla[8,], labels=piepercent_8, main = "IF rank of clarity", col=cols)
 ```
 
+
+
 ```{r results='markup'}
 chitest_cut_cla = chisq.test(tab_cut_cla)
 chitest_cut_cla
