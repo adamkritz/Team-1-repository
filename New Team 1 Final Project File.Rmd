@@ -74,7 +74,7 @@ loadPkg("ggplot2")
 ggplot(cut_count, aes(x = "", y = n, fill = Cut)) +
   geom_bar(stat="identity", width=1) +
   coord_polar("y", start=0) +
-  geom_text(size = 4, aes(label = paste0(round(n, 2), "%")), position = position_stack(vjust = 0.5))+
+  geom_text(size = 4, aes(label = paste0(round(n, 2)*100, "%")), position = position_stack(vjust = 0.5))+
   scale_fill_manual(values = c(6, 7, 8, 3, 4))+
   labs(title='Pie Chart of Cut')
   
