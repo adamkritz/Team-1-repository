@@ -505,7 +505,7 @@ xkabledply(anovaRes, title = "ANOVA comparison between the models")
 
 Comparing the different linear models built, we can see that variation in carat best explains the variation in price. Addition of more variables to that linear model only explains the variation in price slightly better and from the Anova test result, we can see that F statistic values is highest for the fit 2 and lower for all other models. By this we can reject all the models but fit2, since it explains the variation in price best as compared to other models.
 
-## categorical variable affect on cut - Huang
+## What affects the cutting methods?- Huang
 
 After exploring what affects the price of diamonds, we are very interested in the cutting method of the diamonds. As we all know, considering that the better the cutting method, the higher the cost, it seems that the higher the quality of the raw material, the more likely it is to adopt the perfect cutting method.  
 In this dataset, Clarity and color can represent the quality of the raw material.  
