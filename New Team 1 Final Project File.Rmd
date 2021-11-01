@@ -282,7 +282,7 @@ The Tukey post-hoc test for color grade groups, shows that the pairs are signifi
 
 ### **Diamond CLARITY**
 
-The Diamonds data set have eight `clarity` grades with the  highest superscript indicating the best: 
+The Diamonds data set has eight `clarity` grades with the  highest superscript indicating the best: 
  
   I1^1^ | SI2^2^ | SI1^3^ | VS2^4^ | VS1^5^ | VVS2^6^ | VVS1^7^ | IF^8^
 
