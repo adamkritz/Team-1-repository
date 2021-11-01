@@ -405,7 +405,7 @@ summary(fit1)
 
 xkabledply(fit1, title = paste("Model :", format(formula(fit1)) ) )
 
-avplots(fit1)
+avPlots(fit1)
 ```
 
 ```{r, results='markup'}
@@ -503,7 +503,7 @@ xkabledply(anovaRes, title = "ANOVA comparison between the models")
 
 ```
 
-Comparing the different linear models built, we can see that variation in carat best explains the variation in price. Addition of more variables to that linear model only explains the variation in price slightly better and from the Anova test result, we can see that F statistic values is highest for the fit 2 and lower for all other models. By this we can reject all the models but fit2, since it explains the variation in price best as compared to other models.
+Comparing the different linear models built, we can see that variation in carat best explains the variation in price. Addition of more variables to that linear model only explains the variation in price slightly better but those variables demonstrate multi-collinearity and using those variables would be redundant. By this we can reject all the models but fit1, since it explains the variation in price best as compared to other models.
 
 ## categorical variable affect on cut - Huang
 
