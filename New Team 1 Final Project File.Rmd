@@ -225,7 +225,7 @@ We can also infer that it is very likely (significant) for customers to purchase
 
 The Diamonds data set have seven `color` grades with the  highest superscript indicating the best: 
   
-  D^1^ | E^2^ | F^3^ | G^4^ | H^5^ | I^6^ | J^7^
+  J^1^ | I^2^ | H^3^ | G^4^ | F^5^ | E^6^ | D^7^
 
 ```{r,results='markup'}
 color<- subset(diamonds,select = c(color))
