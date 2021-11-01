@@ -611,7 +611,7 @@ p
 ```
   
 
-On the whole, In general, as the rank of color decreases (from D to J), the proportion of using better cutting methods is also decreasing.  
+On the whole, as the rank of color decreases (from D to J), the proportion of using better cutting methods is also decreasing.  
 It seems that the higher ranks of color use greater cutting methods more. 
 In order to obtain evidence to support our conclusion, we performed a Chi-squared test. The result is below. Because the p-value is too small, we have enough evidence to conclude that color of diamonds does affect the cutting methods.  
 
