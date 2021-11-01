@@ -1,6 +1,6 @@
 ---
-title: "Team 1 Mid-term Project"
-author: "Team 1 (Names: Adam Kritz; Huang He..."
+title: "Team 1 Mid-term Project Code"
+author: "Team 1 (Names: Adam Kritz, Osemekhian Ehilen, Suhas Buravalla, Huang He)"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -41,7 +41,7 @@ options(scientific=T, digits = 3)
 diamonds = data.frame(read.csv("diamonds.csv"))
 summary(diamonds)
 str(diamonds)
-diamonds$color = factor(diamonds$color, order=T, levels = c('D', 'E', 'F', 'G', 'H', 'I', 'J'))
+diamonds$color = factor(diamonds$color, order=T, levels = c('J', 'I', 'H', 'G', 'F', 'E', 'D'))
 diamonds$clarity = factor(diamonds$clarity, order=T, levels = c('I1', 'SI2', 'SI1', 'VS2', 'VS1', 'VVS2', 'VVS1', 'IF'))
 diamonds$cut = factor(diamonds$cut, order=T, levels = c('Fair', 'Good', 'Very Good', 'Premium', 'Ideal'))
 colnames(diamonds)[1] = "ID"
@@ -49,7 +49,7 @@ colnames(diamonds)
 summary(diamonds)
 ```
 
-## EDA section - Adam (in progress)
+## EDA section - Adam
 
 ### diamonds summary
 
@@ -133,7 +133,7 @@ ggplot(diamonds, aes(y=carat)) +
 
 ### Price Exploration
 
-```{r d10kp price}
+```{r price exploration}
 ggplot(diamonds, aes(y=price)) + 
   geom_boxplot() + 
   geom_boxplot(colour="black", fill="blue", outlier.colour="blue", outlier.size=5, alpha = 0.8) +
@@ -163,6 +163,7 @@ The Diamonds data set have five `cut` types with the  highest superscript indica
    Fair^1^ | Good^2^ | Very Good^3^ | Premium^4^ | Ideal^5^
    
 ```{r, results='hide'}
+loadPkg('viridis')
 
 diamonds_outliers_removed<- outlierKD2(diamonds,price, TRUE,FALSE, FALSE, FALSE)
 ```
@@ -179,16 +180,22 @@ barplot(table(cut),main = "Bar Plot on Diamonds Cut Type",xlab = "Cut",ylab = "C
 It is noticed from the bar plot that most of the customers went for the `Ideal` Diamond cut which is `100%` from the cut scale (20% for each level of cut grade). 
 
 ```{r,results = "markup"}
-ggplot(diamonds,aes(x=cut,y=price,fill=cut))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamonds Cut")
+loadPkg("ggridges")
+ggplot(diamonds,aes(x=cut,y=price,fill=cut))+geom_boxplot(alpha=0.3)+theme_light()+ggtitle("Box Plot on Diamonds Cut")
 
 
-ggplot(diamonds_outliers_removed,aes(x=cut,y=price,fill=cut))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamonds Cut (Outliers Minimized)")
+ggplot(diamonds_outliers_removed,aes(x=cut,y=price,fill=cut))+geom_boxplot(alpha=0.3)+ggtitle("Box Plot on Diamonds Cut (Outliers Minimized)")
+
+ggplot(diamonds_outliers_removed, aes(x = price, y = cut, fill = ..x..))+ggridges::geom_density_ridges_gradient(scale = 2, rel_min_height = 0.01)+scale_fill_viridis(option = "A", direction = -1) + ggtitle("Ridge plot showing Price of diamonds by cut")
 
 
 caov <- aov(diamonds_outliers_removed$price~cut,data = diamonds_outliers_removed)
 ```
 
-It can be noticed from the box plot that the mean of Ideal cut is different from other mean cuts.
+It can be noticed from the box plot that  fair cut has the maximum median.
+The ridge plot gives a clear view that the means are higher than the median (positively skewed) and that most
+Customers went for diamonds less than $5,000 regardless of cut type.
+
 
 
 ### **ANOVA of Price and Cut**
@@ -237,12 +244,16 @@ It is noticed from the bar plot that most of the customers went for the `G` Diam
 
 
 ```{r, results='markup'}
-ggplot(diamonds,aes(x=color,y=price,fill=color))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamonds Color")
+ggplot(diamonds,aes(x=color,y=price,fill=color))+geom_boxplot(alpha=0.3)+theme_light()+ggtitle("Box Plot on Diamonds Color")
 
-ggplot(diamonds_outliers_removed,aes(x=color,y=price,fill=color))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamonds Color (Outliers Minimized)")
+ggplot(diamonds_outliers_removed,aes(x=color,y=price,fill=color))+geom_boxplot(alpha=0.3)+theme_light()+ggtitle("Box Plot on Diamonds Color (Outliers Minimized)")
+
+ggplot(diamonds_outliers_removed, aes(x = price, y = color, fill = ..x..))+ggridges::geom_density_ridges_gradient(scale = 2, rel_min_height = 0.01)+scale_fill_viridis(option = "A", direction = -1) + ggtitle("Ridge plot showing Price of diamonds by color")
 ```
 
-It is noticed from the boxplot that the means of color type `F` to `J` are higher than color type `D, E`.
+The boxplot shows that color grade ‘J’ has the highest median and an increase in median from ‘D’-’J’.
+The ridge plot also shows a positive skewness and the fact that most customers went for lower price ($5,000) diamonds despite the color grade.
+
 
 ### **ANOVA of Price and Color**
 
@@ -287,12 +298,16 @@ It is noticed from the bar plot that most of the customers went for the `SI1` Di
 
 ```{r,results='markup'}
 
-ggplot(diamonds,aes(x=clarity,y=price,fill=clarity))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamond's Clarity")
+ggplot(diamonds,aes(x=clarity,y=price,fill=clarity))+geom_boxplot(alpha=0.3)+theme_light()+ggtitle("Box Plot on Diamond's Clarity")
 
-ggplot(diamonds_outliers_removed,aes(x=clarity,y=price,fill=clarity))+geom_boxplot()+theme_light()+ggtitle("Box Plot on Diamonds Clarity (Outliers Minimized)")
+ggplot(diamonds_outliers_removed,aes(x=clarity,y=price,fill=clarity))+geom_boxplot(alpha=0.3)+theme_light()+ggtitle("Box Plot on Diamonds Clarity (Outliers Minimized)")
+
+ggplot(diamonds_outliers_removed, aes(x = price, y = clarity, fill = ..x..))+ggridges::geom_density_ridges_gradient(scale = 2, rel_min_height = 0.01)+scale_fill_viridis(option = "A", direction = -1) + ggtitle("Ridge plot showing Price of diamonds by clarity")
 ```
 
-The boxplot above shows a very distinct variation with the mean of `SI2, I1, SI1` diamond clarity types.
+The clarity type ‘SI2’ has the highest median. 
+Also, most customers went for diamonds less than $5,000 despite the clarity type.
+
 
 ### **ANOVA of Price and Clarity**
 
@@ -503,7 +518,7 @@ xkabledply(anovaRes, title = "ANOVA comparison between the models")
 
 ```
 
-Comparing the different linear models built, we can see that variation in carat best explains the variation in price. Addition of more variables to that linear model only explains the variation in price slightly better but those variables demonstrate multi-collinearity and using those variables would be redundant. By this we can reject all the models but fit1, since it explains the variation in price best as compared to other models.
+Comparing the different linear models built, we can see that variation in carat best explains the variation in price. Addition of more variables to that linear model only explains the variation in price slightly better and from the Anova test result, we can see that F statistic values is highest for the fit 2 and lower for all other models. By this we can reject all the models but fit2, since it explains the variation in price best as compared to other models.
 
 ## What affects the cutting methods?- Huang  
   
@@ -592,9 +607,11 @@ p = ggbarstats(data = diamonds, x = cut, y = color,results.subtitle = F,palette 
 p
 ```
   
-On the whole, In general, as the rank of color decreases (from D to J), the proportion of using better cutting methods is also decreasing.    
-It seems that the higher ranks of color use greater cutting methods more.   
-In order to obtain evidence to support our conclusion, we performed a Chi-squared test. The result is below. Because the p-value is too small, we have enough evidence to conclude that color of diamonds does affect the cutting methods.    
+
+On the whole, In general, as the rank of color decreases (from D to J), the proportion of using better cutting methods is also decreasing.  
+It seems that the higher ranks of color use greater cutting methods more. 
+In order to obtain evidence to support our conclusion, we performed a Chi-squared test. The result is below. Because the p-value is too small, we have enough evidence to conclude that color of diamonds does affect the cutting methods.  
+
 ```{r results='markup'}
 chitest_cut_col = chisq.test(tab_cut_col)
 chitest_cut_col
