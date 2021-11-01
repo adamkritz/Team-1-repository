@@ -74,7 +74,7 @@ loadPkg("ggplot2")
 ggplot(cut_count, aes(x = "", y = n, fill = Cut)) +
   geom_bar(stat="identity", width=1) +
   coord_polar("y", start=0) +
-  geom_text(size = 4, aes(label = paste0(round(n, 2)*100, "%")), position = position_stack(vjust = 0.5))+
+  geom_text(size = 4, aes(label = paste0(round(n, 2), "%")), position = position_stack(vjust = 0.5))+
   scale_fill_manual(values = c(6, 7, 8, 3, 4))+
   labs(title='Pie Chart of Cut')
   
@@ -322,109 +322,179 @@ The post-hoc test made it clear that aside from these pairs SI2-I1, VS1-VS2, IF-
 
 ## continious variable affect on price - Suhas
 
+```{r, results='markup'}
+# T.test for continuous variables
 
-```{r}
+diamonds_carat1 = subset(diamonds, carat < 1)
+diamonds_carat2 = subset(diamonds, carat >= 1)
+
+#two- sample ttest
+
+t.test(diamonds_carat1$price, diamonds_carat2$price)
+
+#for depth
+
+diamonds_depth1 = subset(diamonds, depth < 61.7)
+diamonds_depth2 = subset(diamonds, depth > 61.8)
+
+#two- sample ttest
+
+t.test(diamonds_depth1$price, diamonds_depth2$price)
+
+#for table 
+
+diamonds_table1 = subset(diamonds, table < 57.5)
+diamonds_table2 = subset(diamonds, table > 57.5)
+
+#two- sample ttest
+
+t.test(diamonds_table1$price, diamonds_table2$price)
+
+
+#for x
+
+
+diamonds_x1 = subset(diamonds, x < 5.73)
+diamonds_x2 = subset(diamonds, x > 5.73)
+
+#two- sample ttest
+
+t.test(diamonds_x1$price, diamonds_x2$price)
+
+#for y
+
+
+diamonds_y1 = subset(diamonds, y < 5.7)
+diamonds_y2 = subset(diamonds, y > 5.7)
+
+#two- sample ttest
+
+t.test(diamonds_y1$price, diamonds_y2$price)
+
+#for z
+
+diamonds_z1 = subset(diamonds, z < 3.5)
+diamonds_z2 = subset(diamonds, z > 3.5)
+
+#two- sample ttest
+
+t.test(diamonds_z1$price, diamonds_z2$price)
+
+```
+From the t-tests above we can see that there is a significant difference in average price of diamond when we split the samples at the mean for variables such as carat, x, y, z and table. There is almost no difference in mean observed when we perform the two sample t-test for depth. From these tests we can get a sense of the correlations between price and other variables. Let us calculate the correlation matrix and plot a corrplot to see these relationships.
+
+
+```{r, results= 'markup'}
 # Creating a subset of continuous variables, calculating the correlation matrix and making the corrplot to identify the strongest relationships between continuous variables.
 
 diamonds_continuous = subset(diamonds, select = c("carat", "depth", "table", "price", "x", "y", "z"))
 loadPkg("corrplot")
 diamonds_continuous_cor= cor(diamonds_continuous)
 corrplot(diamonds_continuous_cor, method= "number")
-
+library(ggplot2)
+library(car)
 ```
 
-```{r}
+From the correlation matrix and corrplot we can see which variables have the strongest relationship with price of the diamond. We can see that carat and price have a very strong positive relationship followed by x, y, z and then table. 
+
+Let us build some linear models to explain the variation in price with respect to other variables.
+
+```{r, results='markup'}
 fit1 <- lm(price ~ carat, data = diamonds)
 summary(fit1)
 
 xkabledply(fit1, title = paste("Model :", format(formula(fit1)) ) )
 
-
-
+avplots(fit1)
 ```
 
-```{r}
+```{r, results='markup'}
 fit1a <- lm(price ~ x, data = diamonds)
 summary(fit1a)
 
 xkabledply(fit1a, title = paste("Model :", format(formula(fit1a)) ) )
 
-
+avPlots(fit1a)
 
 ```
 
-```{r}
+```{r, results='markup'}
 fit1b <- lm(price ~ y, data = diamonds)
 summary(fit1b)
 
 xkabledply(fit1b, title = paste("Model :", format(formula(fit1b)) ) )
 
-
+avPlots(fit1b)
 
 ```
 
-```{r}
+```{r, results='markup'}
 fit1c <- lm(price ~ z, data = diamonds)
 summary(fit1c)
 
 xkabledply(fit1c, title = paste("Model :", format(formula(fit1c)) ) )
 
 
-
+avPlots(fit1c)
 ```
 
-```{r}
+```{r, results='markup'}
+fit1d <- lm(price ~ table, data = diamonds)
+summary(fit1d)
+
+xkabledply(fit1d, title = paste("Model :", format(formula(fit1c)) ) )
+
+
+avPlots(fit1d)
+```
+
+```{r, results='markup'}
 fit2 <- lm(price ~ carat+x, data = diamonds)
 
 
 xkabledply(fit2, title = paste("Model :", format(formula(fit2)) ) )
 xkablevif(fit2)
 summary(fit2)
-
+avPlots(fit2)
 ```
 
-```{r}
+```{r, results='markup'}
 fit3 <- lm(price ~ carat+x+y, data = diamonds)
 
 
 xkabledply(fit3, title = paste("Model :", format(formula(fit3)) ) )
 xkablevif(fit3)
 summary(fit3)
+avPlots(fit3)
 
 ```
 
-```{r}
-fit3a <- lm(price ~ x+y+z, data = diamonds)
 
-
-xkabledply(fit3a, title = paste("Model :", format(formula(fit3a)) ) )
-xkablevif(fit3a)
-summary(fit3a)
-
-```
-
-```{r}
+```{r, results='markup'}
 fit4 <- lm(price ~ carat+x+y+z, data = diamonds)
 
 
 xkabledply(fit4, title = paste("Model :", format(formula(fit4)) ) )
 xkablevif(fit4)
 summary(fit4)
+avPlots(fit4)
 
 ```
 
-```{r}
+
+```{r, results='markup'}
 fit5 <- lm(price ~ carat+x+y+z+table, data = diamonds)
 
 
 xkabledply(fit5, title = paste("Model :", format(formula(fit5)) ) )
 xkablevif(fit5)
 summary(fit5)
-
+avPlots(fit5)
 ```
 
-```{r}
-anova(fit1, fit2,fit3, fit4, fit5) -> anovaRes
+
+```{r, results='markup'}
+anova(fit1, fit1a, fit1b, fit1c, fit1d, fit2,fit3, fit4, fit5) -> anovaRes
 anovaRes
 str(anovaRes)
 
@@ -433,7 +503,9 @@ xkabledply(anovaRes, title = "ANOVA comparison between the models")
 
 ```
 
-## What variables affect on cut? - Huang
+Comparing the different linear models built, we can see that variation in carat best explains the variation in price. Addition of more variables to that linear model only explains the variation in price slightly better and from the Anova test result, we can see that F statistic values is highest for the fit 2 and lower for all other models. By this we can reject all the models but fit2, since it explains the variation in price best as compared to other models.
+
+## categorical variable affect on cut - Huang
 
 ### Clarity VS Cut
 ```{r results='markup'}
@@ -463,13 +535,6 @@ pie(tab_cut_cla[6,], labels=piepercent_6, main = "VVS2 rank of color", col=cols)
 pie(tab_cut_cla[7,], labels=piepercent_7, main = "VVS1 rank of color", col=cols)
 pie(tab_cut_cla[8,], labels=piepercent_8, main = "IF rank of color", col=cols)
 ```
-
-```{r}
-loadPkg("ggstatsplot")
-p = ggbarstats(data= diamonds, x = cut, y = color, bar.proptest = F, palette = 'Set3', results.subtitle = F,xlab = "Color" ,ylab = "Percentage" )
-p
-```
-
 
 ```{r results='markup'}
 chitest_cut_cla = chisq.test(tab_cut_cla)
@@ -505,17 +570,10 @@ pie(tab_cut_col[7,], labels=piepercent_j, main = "J rank of color", col=cols)
 ```
 
 
-```{r}
-p = ggbarstats(data= diamonds, x = cut, y = clarity, bar.proptest = F, palette = 'Set3', results.subtitle = F,xlab = "Clarity" ,ylab = "Percentage" )
-p
-```
-
 ```{r results='markup'}
 chitest_cut_col = chisq.test(tab_cut_col)
 chitest_cut_col
 ```
-
-
 
 
 
