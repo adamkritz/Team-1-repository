@@ -11,7 +11,7 @@
 
 <meta name="author" content="Team 1 (Names: Adam Kritz, Osemekhian Ehilen, Suhas Buravalla, Huang He)" />
 
-<meta name="date" content="2021-11-01" />
+<meta name="date" content="2021-11-03" />
 
 <title>Team 1 Mid-term Project Code</title>
 
@@ -257,13 +257,114 @@ div.tocify {
 
 <h1 class="title toc-ignore">Team 1 Mid-term Project Code</h1>
 <h4 class="author">Team 1 (Names: Adam Kritz, Osemekhian Ehilen, Suhas Buravalla, Huang He)</h4>
-<h4 class="date">2021-11-01</h4>
+<h4 class="date">2021-11-03</h4>
 
 </div>
 
 
 <div id="midterm-project" class="section level1">
 <h1>Midterm Project</h1>
+<div id="background" class="section level2">
+<h2>Background</h2>
+<div id="motivation" class="section level3">
+<h3>Motivation</h3>
+<p>Our team decided to work with a dataset that contained information about diamonds. We were interested in what factors affect diamond prices, as we all have interest in buying diamonds in the future. We felt if we were able to research diamonds, we could make a more informed decision in the future when it came to buying diamonds. We also hope our research can help teach others about what factors affect diamond prices, so they can make a more informed decision as well.</p>
+</div>
+<div id="dataset" class="section level3">
+<h3>Dataset</h3>
+<p><a href="https://www.kaggle.com/shivam2503/diamonds">Here is a link to our dataset</a></p>
+<p>Our diamonds dataset comes from Kaggle. Our data was originally taken from Tiffany &amp; Co.’s snapshot pricelist from 2017. Tiffany and Co. is a large American luxury jewelry corporation, so we felt their data would be very applicable to those looking to buy diamonds.</p>
+<p>Our dataset has 53,940 observations in it. There are ten unique variables and one ID number for each diamond.</p>
+<p>There are three categorical variables that are all ordinal variables:</p>
+<ul>
+<li>Cut - the quality of the cut of the diamond
+<ul>
+<li>There are five levels of cut, from worst to best: Fair, Good, Very Good, Premium, Ideal</li>
+</ul></li>
+<li>Color - the quality of the color of the diamond
+<ul>
+<li>There are seven levels of color, from worst to best: J, I, H, G, F, E, D</li>
+</ul></li>
+<li>Clarity - the quality of the clarity of the diamond
+<ul>
+<li>There are eight levels of clarity, from worst to best: I1, SI2, SI1, VS2, VS1, VVS2, VVS1, IF</li>
+</ul></li>
+</ul>
+<p>There are also seven continuous variables that are all ratio variables:</p>
+<ul>
+<li>Price - the price of the diamond in USD
+<ul>
+<li>Ranges from 326USD - 18,823USD</li>
+</ul></li>
+<li>Carat - the weight of the diamond
+<ul>
+<li>Ranges from 0.2 - 5.01</li>
+</ul></li>
+<li>x - the length of the diamond
+<ul>
+<li>Ranges from 0 - 10.74</li>
+</ul></li>
+<li>y - the width of the diamond
+<ul>
+<li>Ranges from 0 - 58.9</li>
+</ul></li>
+<li>z - the depth of the diamond
+<ul>
+<li>Ranges from 0 - 31.8</li>
+</ul></li>
+<li>Depth - the total depth percentage of the diamond
+<ul>
+<li>Calculated as: 2 * z / (x + y)</li>
+<li>Ranges from 43 - 79</li>
+</ul></li>
+<li>Table - the width of top of diamond relative to widest point
+<ul>
+<li>Ranges from 43 - 95</li>
+</ul></li>
+</ul>
+<p>Overall, the dataset is relatively clean. However, there are just a still a few abnormalities in the data.</p>
+<ul>
+<li>There are outliers in many of the variables</li>
+<li>There are a few diamonds that have zero values in x, y, or z. This is clearly a mistake, as all diamonds are three dimensional objects.</li>
+</ul>
+<p>These issues are addressed in future sections when they present themselves.</p>
+</div>
+<div id="prior-work-on-the-diamonds-dataset" class="section level3">
+<h3>Prior Work on the Diamonds Dataset</h3>
+<p>The diamonds dataset is an extremely popular dataset, so there has been plenty of work done on it. Much of this work is done through machine learning or more advanced statistical techniques that are hard for the average person to understand. Our group specifically wanted to create an easy to understand R Markdown file that has clear results from statistical tests.</p>
+</div>
+<div id="smart-question-development" class="section level3">
+<h3>SMART Question Development</h3>
+<p>Originally, our group planned the split the data into four price sections to conduct our research, with each group member getting a specific price section to look at. However, we found there was a central flaw in this plan. When splitting the diamonds into separate price sections, it did not allow us to compare diamonds from one section to another. While we could compare the statistics from the sections overall, we could not compare individual diamonds between sections. This meant we could not actually see the differences easily to between cheap and expensive diamonds.</p>
+<p>Instead, we decided to focus on three categories of SMART Questions:</p>
+<ul>
+<li><p>How do categorical variables affect price?</p></li>
+<li><p>How do continuous variables affect price?</p></li>
+<li><p>How do categorical variables affect cut?</p></li>
+</ul>
+<p>Within each SMART category, we then created more specific SMART Questions:</p>
+<ul>
+<li>How do categorical variables affect price?
+<ul>
+<li>Do different levels of cut have different prices?</li>
+<li>Do different levels of color have different prices?</li>
+<li>Do different levels of clarity have different prices?</li>
+</ul></li>
+<li>How do continuous variables affect price?
+<ul>
+<li>Do different levels of x, y, z, table, and depth have different prices?</li>
+<li>What continuous variables are the best predictors for price?</li>
+</ul></li>
+<li>How do categorical variables affect cut?
+<ul>
+<li>Do different levels of clarity have different cutting methods?<br />
+</li>
+<li>Do different ranks of color have different cutting methods?</li>
+</ul></li>
+</ul>
+<p>These are the SMART Questions we will answer throughout the course of our research. We believe these questions will allow those at any level of statistical knowledge to understand how the different characteristics of diamonds interact.</p>
+</div>
+</div>
 <div id="importing-the-data" class="section level2">
 <h2>Importing the Data</h2>
 <pre class="r"><code>diamonds = data.frame(read.csv(&quot;diamonds.csv&quot;))
@@ -276,10 +377,10 @@ colnames(diamonds)[1] = &quot;ID&quot;
 colnames(diamonds)
 summary(diamonds)</code></pre>
 </div>
-<div id="eda-section---adam" class="section level2">
-<h2>EDA section - Adam</h2>
-<div id="diamonds-summary" class="section level3">
-<h3>diamonds summary</h3>
+<div id="explaratory-data-analysis" class="section level2">
+<h2>Explaratory Data Analysis</h2>
+<div id="full-summary" class="section level3">
+<h3>Full Summary</h3>
 <pre class="r"><code>xkablesummary(diamonds, title = &quot;Summary of Diamonds&quot;)</code></pre>
 <table class="table table-striped" style="width: auto !important; ">
 <caption>
@@ -2970,6 +3071,13 @@ chitest_cut_col</code></pre>
 ## data:  tab_cut_col
 ## X-squared = 310, df = 24, p-value &lt;2e-16</code></pre>
 </div>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>How did the research you gathered contribute to your question development? What additional information would be beneficial? What future research would we do?</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
 </div>
 </div>
 
