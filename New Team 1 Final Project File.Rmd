@@ -22,10 +22,6 @@ output:
 library(ezids)
 ```
 
-# Midterm Project
-
-## Importing the Data
-
 ```{r setup, include=FALSE}
 # some of common options (and the defaults) are: 
 # include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
@@ -36,6 +32,99 @@ options(scientific=T, digits = 3)
 # ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
 # use scipen=999 to prevent scientific notation at all times
 ```
+
+# Midterm Project
+
+## Background
+
+### Motivation
+
+Our team decided to work with a dataset that contained information about diamonds. We were interested in what factors affect diamond prices, as we all have interest in buying diamonds in the future. We felt if we were able to research diamonds, we could make a more informed decision in the future when it came to buying diamonds. We also hope our research can help teach others about what factors affect diamond prices, so they can make a more informed decision as well.
+
+### Dataset
+
+[Here is a link to our dataset](https://www.kaggle.com/shivam2503/diamonds)
+
+Our diamonds dataset comes from Kaggle. Our data was originally taken from Tiffany & Co.'s snapshot pricelist from 2017. Tiffany and Co. is a large American luxury jewelry corporation, so we felt their data would be very applicable to those looking to buy diamonds.
+
+Our dataset has 53,940 observations in it. There are ten unique variables and one ID number for each diamond. 
+
+There are three categorical variables that are all ordinal variables:
+
+* Cut - the quality of the cut of the diamond
+    + There are five levels of cut, from worst to best: Fair, Good, Very Good, Premium, Ideal
+    
+* Color - the quality of the color of the diamond
+    + There are seven levels of color, from worst to best: J, I, H, G, F, E, D
+    
+* Clarity - the quality of the clarity of the diamond
+    + There are eight levels of clarity, from worst to best: I1, SI2, SI1, VS2, VS1, VVS2, VVS1, IF
+    
+There are also seven continuous variables that are all ratio variables:
+
+* Price - the price of the diamond in USD
+    + Ranges from 326USD - 18,823USD
+    
+* Carat - the weight of the diamond
+    + Ranges from 0.2 - 5.01
+    
+* x - the length of the diamond
+    + Ranges from 0 - 10.74
+    
+* y - the width of the diamond
+    + Ranges from 0 - 58.9
+        
+* z - the depth of the diamond
+    + Ranges from 0 - 31.8
+        
+* Depth - the total depth percentage of the diamond
+    + Calculated as: 2 * z / (x + y)
+    + Ranges from 43 - 79
+        
+* Table - the width of top of diamond relative to widest point
+    + Ranges from 43 - 95
+    
+Overall, the dataset is relatively clean. However, there are just a still a few abnormalities in the data.
+
+* There are outliers in many of the variables
+* There are a few diamonds that have zero values in x, y, or z. This is clearly a mistake, as all diamonds are three dimensional objects.
+
+These issues are addressed in future sections when they present themselves.
+
+### Prior Work on the Diamonds Dataset
+
+The diamonds dataset is an extremely popular dataset, so there has been plenty of work done on it. Much of this work is done through machine learning or more advanced statistical techniques that are hard for the average person to understand. Our group specifically wanted to create an easy to understand R Markdown file that has clear results from statistical tests.
+
+### SMART Question Development
+
+Originally, our group planned the split the data into four price sections to conduct our research, with each group member getting a specific price section to look at. However, we found there was a central flaw in this plan. When splitting the diamonds into separate price sections, it did not allow us to compare diamonds from one section to another. While we could compare the statistics from the sections overall, we could not compare individual diamonds between sections. This meant we could not actually see the differences easily to between cheap and expensive diamonds.
+
+Instead, we decided to focus on three categories of SMART Questions:
+
+* How do categorical variables affect price?
+
+* How do continuous variables affect price? 
+
+* How do categorical variables affect cut? 
+
+Within each SMART category, we then created more specific SMART Questions:
+
+* How do categorical variables affect price?
+    + Do different levels of cut have different prices?
+    + Do different levels of color have different prices?
+    + Do different levels of clarity have different prices?
+    
+* How do continuous variables affect price? 
+    + Do different levels of x, y, z, table, and depth have different prices?
+    + What continuous variables are the best predictors for price?
+
+* How do categorical variables affect cut? 
+    + Do different levels of clarity have different cutting methods?  
+    + Do different ranks of color have different cutting methods?
+    
+These are the SMART Questions we will answer throughout the course of our research. We believe these questions will allow those at any level of statistical knowledge to understand how the different characteristics of diamonds interact.
+
+## Importing the Data
 
 ```{r read the dataset}
 diamonds = data.frame(read.csv("diamonds.csv"))
@@ -49,9 +138,9 @@ colnames(diamonds)
 summary(diamonds)
 ```
 
-## EDA section - Adam
+## Explaratory Data Analysis
 
-### diamonds summary
+### Full Summary
 
 ```{r, results = 'markup'}
 xkablesummary(diamonds, title = "Summary of Diamonds")
@@ -621,6 +710,11 @@ chitest_cut_col
 ```
 
 
+## Conclusion
 
+How did the research you gathered contribute to your question development?
+What additional information would be beneficial?
+What future research would we do?
 
+## References
 
