@@ -128,14 +128,10 @@ These are the SMART Questions we will answer throughout the course of our resear
 
 ```{r read the dataset}
 diamonds = data.frame(read.csv("diamonds.csv"))
-summary(diamonds)
-str(diamonds)
 diamonds$color = factor(diamonds$color, order=T, levels = c('J', 'I', 'H', 'G', 'F', 'E', 'D'))
 diamonds$clarity = factor(diamonds$clarity, order=T, levels = c('I1', 'SI2', 'SI1', 'VS2', 'VS1', 'VVS2', 'VVS1', 'IF'))
 diamonds$cut = factor(diamonds$cut, order=T, levels = c('Fair', 'Good', 'Very Good', 'Premium', 'Ideal'))
 colnames(diamonds)[1] = "ID"
-colnames(diamonds)
-summary(diamonds)
 ```
 
 ## Explaratory Data Analysis
@@ -143,16 +139,29 @@ summary(diamonds)
 ### Full Summary
 
 ```{r, results = 'markup'}
-xkablesummary(diamonds, title = "Summary of Diamonds")
+sum = xkablesummary(diamonds, title = "Summary of Diamonds")
+sum
 ```
-
+Here we can see a full summary of the diamonds dataset. In order to better understand the data, let's look at each variable individually.
 
 ### Categorical Data Exploration
 
-```{r categorical variables}
-barplot(table(diamonds$cut), col = c(6, 7, 8, 3, 4), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
+In this section we will look at some plots of categorical data
+
+```{r Color Exploration}
 barplot(table(diamonds$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
+```
+
+Beginning with color, we can see that the G rank has the highest quantity of diamonds, at `r length(which(diamonds$color=='G'))`, and J has the lowest quantity of diamonds at `length(which(diamonds$color=='J'))`. Overall, there seems to be more diamonds near the middle color quality.
+
+```{r Clarity Exploration}
 barplot(table(diamonds$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplot of Clarity', xlab = "Clarity", ylab = "Frequency")
+```
+
+Clarity tells a similar story. In this case, the SI1 level has the most diamonds, at `r length(which(diamonds$clarity =='SI1'))`. I1 has the least at `r length(which(diamonds$clarity=='IF'))`. Again, there are the most diamonds at the middle to lower ranks of clarity than at the extremes.
+
+```{r Cut Exploration}
+barplot(table(diamonds$cut), col = c(6, 7, 8, 3, 4), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
 
 cut_count = dplyr::count(diamonds, cut)
 colnames(cut_count)[colnames(cut_count) == 'cut'] <- 'Cut'
@@ -163,38 +172,30 @@ loadPkg("ggplot2")
 ggplot(cut_count, aes(x = "", y = n, fill = Cut)) +
   geom_bar(stat="identity", width=1) +
   coord_polar("y", start=0) +
-  geom_text(size = 4, aes(label = paste0(round(n, 2), "%")), position = position_stack(vjust = 0.5))+
+  geom_text(size = 4, aes(label = paste0(round(n, 2), "")), position = position_stack(vjust = 0.5))+
   scale_fill_manual(values = c(6, 7, 8, 3, 4))+
   labs(title='Pie Chart of Cut')
-  
 ```
 
-### diamonds numerical text summaries
+Cut has a different spread compare to the other two variables. In this case, the highest quantity of diamonds, `r length(which(diamonds$cut =='Ideal'))`, are located at the top at the Ideal level. The least are located in the Fair level, only containing `r length(which(diamonds$cut =='Fair'))`. As the level of cut increases, so do the quantity of diamonds in that level.
 
-```{r numerical variables text}
-mean(diamonds$depth)
-sd(diamonds$depth)
+To better visualize the differences in cut, we also created a pie chart. Ideal diamonds make up 40% of the data. If you were to combine all Fair, Good, and Premium diamonds, there would still be more Ideal diamonds. This vast discrepancy should be noted when looking at the coming research.
 
-mean(diamonds$table)
-sd(diamonds$table)
+### Continious Data Exploration
 
-mean(diamonds$carat)
-sd(diamonds$carat)
+In this section we will look at all the continuous variables besides price.
 
-mean(diamonds$price)
-sd(diamonds$price)
-```
-
-### Numerical Data Exploration
-
-```{r numerical variables}
-# removed weird outliers, note in slides
+```{r Length, Size, Depth Exploration}
 diaNO = subset(diamonds, x > 0 & y > 0 & z > 0 & y <30 & z <30)
 ggplot(diaNO, aes(x, y, color=z)) +
   geom_point(size = 8, alpha = 0.6) +
-  ggtitle('Y versus X versus Z for Diamonds') +
+  ggtitle('Y versus X versus Z for Diamonds (Outliers Removed)') +
   scale_color_gradient2(midpoint = 5, low="blue", mid="green", high="red")
+```
 
+Here we can see a plot of x, y, and z, or the length, width, and depth of diamonds. The outliers are removed in this plot, so there are no values below zero or above thirty, in order to improve the readability of the plot. This plot shows a general trend in the data, that x, y, and z all increase and decrease together. In other words, higher x means higher y means higher z.
+
+```{r Table Exploration}
 ggplot(diamonds, aes(y=table)) + 
   geom_histogram(col="black", 
                  fill="green", 
@@ -203,7 +204,11 @@ ggplot(diamonds, aes(y=table)) +
   labs(title='Histogram of Table') +
   coord_flip() +
   labs(y="Table", x="Frequency")
+```
 
+Table is the first of two extremely centralized variables, as can be seen from the histogram. The data on the edges is so small, it cannot even be seen. The mean of table is `r mean(diamonds$table)` and the standard deviation is `r sd(diamonds$table)`, which is reflected in the histogram.
+
+```{r Depth Exploration}
 ggplot(diamonds, aes(y=depth)) + 
   geom_histogram(col="black", 
                  fill="red", 
@@ -212,7 +217,11 @@ ggplot(diamonds, aes(y=depth)) +
   coord_flip() +
   labs(title='Histogram of Depth') +
   labs(y="Depth", x="Frequency")
+```
 
+Depth is the second of the extremely centralized variables. This is reflected again in the mean, `r mean(diamonds$depth)`, and the standard deviation, `r sd(diamonds$depth)`. This can also be seen in the histogram, with all of the data extremely centralized around the mean.
+
+```{r Carat Exploration}
 ggplot(diamonds, aes(y=carat)) + 
   geom_boxplot() + 
   geom_boxplot(colour="black", fill="orange", outlier.colour="orange", outlier.size=5, alpha = 0.8) +
@@ -220,9 +229,13 @@ ggplot(diamonds, aes(y=carat)) +
   labs(y="Carat")
 ```
 
+Carat has a much different spread than table and depth, though the values are still grouped together. However, this time they are near the bottom, as every value above 2 is considered an outlier for carat. Overall, the carat distribution is extremely right skewed. The mean for carat is `r mean(diamonds$carat)` and the standard deviation is `r sd(diamonds$carat)`.
+
 ### Price Exploration
 
-```{r price exploration}
+Here are a couple plots on price.
+
+```{r Price Exploration}
 ggplot(diamonds, aes(y=price)) + 
   geom_boxplot() + 
   geom_boxplot(colour="black", fill="blue", outlier.colour="blue", outlier.size=5, alpha = 0.8) +
@@ -242,8 +255,11 @@ qqline(diamonds$price)
 
 ```
 
-## caterigocal affect on price - Solomon
+Price has a similar distribution to carat, with most of the diamonds have a relatively low price. There is a large number of outliers over the thirteen thousand due to the low centralization of the data. From the histogram, it can also be seen that the data is right-skewed, similar to carat. Lastly, the Q-Q plot shows that price is most definitely not normal, which will be taken into account when doing tests. The mean of price is `r mean(diamonds$price)` and the standard deviation of price is `r sd(diamonds$price)`.
 
+With the exploratory data analysis complete, we can move onto the SMART questions.
+
+## How do categorical variables affect price? - Solomon
 
 ### **Diamond CUT**
 
@@ -424,7 +440,7 @@ The grand means also made it clear that it is more likely for customers to spend
 The post-hoc test made it clear that aside from these pairs SI2-I1, VS1-VS2, IF-VVS1 which are not significant; all other pairs are significantly different with p-value less than 0.05.
 
 
-## continious variable affect on price - Suhas
+## How Do Continuous Variables Affect Price? - Suhas
 
 
 ```{r, results='markup'}
@@ -612,7 +628,7 @@ Comparing the different linear models built, we can see that variation in carat 
 
 
 
-## What affects the cutting methods?- Huang  
+## How Do Categorical Variables Affect Cut? - Huang
   
 After exploring what affects the price of diamonds, we are very interested in the cutting method of the diamonds. As we all know, considering that the better the cutting method, the higher the cost, it seems that the higher the quality of the raw material, the more likely it is to adopt the perfect cutting method.  
 In this dataset, Clarity and color can represent the quality of the raw material.  
@@ -712,9 +728,25 @@ chitest_cut_col
 
 ## Conclusion
 
-How did the research you gathered contribute to your question development?
-What additional information would be beneficial?
-What future research would we do?
+### How Do Categorical Variables Affect Price?
+
+This was probably the most interesting results we found. It seems that the diamonds in this dataset are statistically more expensive when they have lower quality cuts, colors, and clarity. This is opposite of what logic would tell us when looking at diamonds. There are a few possible explanations for this. One is that the diamonds in our dataset do not have good spreads of data for the their categorical variables, especially for something like cut. However, clarity and color both had enough diamonds in both their lower and higher levels. Another explanation is that bigger diamonds are likely to have lower clarity, cut, and color levels. This is because bigger diamonds are harder to craft to a fine level due to their size. This would explain why bigger, more expensive diamonds have lower other qualities. 
+
+### How Do Continuous Variables Affect Price? 
+
+Our results in this section were difficult to interpret. Since x, y, z, carat, table, and depth are all related to the size of a diamond, these variables had high levels of multicollinearity in models. This made it hard to create linear models using these variables. It was stil interesting to look at the results of the two-sample t-tests conducted on price here, and it seems that many of these variables do play a large factor in determining price.
+
+### How Do Categorical Variables Affect Cut? 
+
+The results in this section matched up with our expectations the most. Higher clarity levels and higher color levels both equate to higher cut levels. 
+
+### Future Research
+
+In the future, it would be interesting to see how the how clarity, cut, and color change with the size of diamonds, to see if our theory on diamond sizes is correct. It would also be interesting to create a predictive model to guess the price or cut of a diamond when given certain other variables. This would allow people to customize a diamond to their own budget. 
+
+It would also always be good to have more information on diamonds in the future, like the shape of the diamond. This could allow us to do more statistical analysis to see what factors influence diamonds. Lastly, it would be interesting to compare diamonds to other gems, like emeralds, sapphires, rubies, opals, pearls, etc. We are curious if the same factors that affect diamonds affect these gems as well.
 
 ## References
+
+Agrawal, S. (2017, May 24). Diamonds. Kaggle.com. (https://www.kaggle.com/shivam2503/diamonds)
 
