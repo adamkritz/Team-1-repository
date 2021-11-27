@@ -33,4 +33,29 @@ options(scientific=T, digits = 3)
 # use scipen=999 to prevent scientific notation at all times
 ```
 
+## Importing the Data
+
+```{r read the dataset}
+diamonds = data.frame(read.csv("diamonds.csv"))
+diamonds$color = factor(diamonds$color, order=T, levels = c('J', 'I', 'H', 'G', 'F', 'E', 'D'))
+diamonds$clarity = factor(diamonds$clarity, order=T, levels = c('I1', 'SI2', 'SI1', 'VS2', 'VS1', 'VVS2', 'VVS1', 'IF'))
+diamonds$cut = factor(diamonds$cut, order=T, levels = c('Fair', 'Good', 'Very Good', 'Premium', 'Ideal'))
+colnames(diamonds)[1] = "ID"
+```
+
+## Adam - Linear Regression to predict price
+
+
+
+## Suhas - PCR modeling to predict price
+
+
+
+## Solomon - Logistic Regression to predict cut
+
+
+
+## Huang - KNN modeling to predict cut
+
+
 
