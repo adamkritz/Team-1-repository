@@ -33,6 +33,8 @@ options(scientific=T, digits = 3)
 # use scipen=999 to prevent scientific notation at all times
 ```
 
+# Midterm Code
+
 ## Importing the Data
 
 ```{r read the dataset}
@@ -43,9 +45,317 @@ diamonds$cut = factor(diamonds$cut, order=T, levels = c('Fair', 'Good', 'Very Go
 colnames(diamonds)[1] = "ID"
 ```
 
+## EDA Code
+
+```{r, results = 'markup'}
+sum = xkablesummary(diamonds, title = "Summary of Diamonds")
+sum
+```
+
+### summary table
+
+```{r Color Exploration}
+barplot(table(diamonds$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
+```
+
+
+### Categorical Data Exploration
+
+color plot
+
+```{r Clarity Exploration}
+barplot(table(diamonds$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplot of Clarity', xlab = "Clarity", ylab = "Frequency")
+```
+clarity plot
+
+```{r Cut Exploration}
+barplot(table(diamonds$cut), col = c(6, 7, 8, 3, 4), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
+
+cut_count = dplyr::count(diamonds, cut)
+colnames(cut_count)[colnames(cut_count) == 'cut'] <- 'Cut'
+cut_count$n = cut_count$n/sum(cut_count$n)
+
+loadPkg("ggplot2")
+
+ggplot(cut_count, aes(x = "", y = n, fill = Cut)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  geom_text(size = 4, aes(label = paste0(round(n, 2), "")), position = position_stack(vjust = 0.5))+
+  scale_fill_manual(values = c(6, 7, 8, 3, 4))+
+  labs(title='Pie Chart of Cut')
+```
+cut plot
+
+### Continious Data Exploration
+
+In this section we will look at all the continuous variables besides price.
+
+```{r Length, Size, Depth Exploration}
+diaNO = subset(diamonds, x > 0 & y > 0 & z > 0 & y <30 & z <30)
+ggplot(diaNO, aes(x, y, color=z)) +
+  geom_point(size = 8, alpha = 0.6) +
+  ggtitle('Y versus X versus Z for Diamonds (Outliers Removed)') +
+  scale_color_gradient2(midpoint = 5, low="blue", mid="green", high="red")
+```
+
+x vs y vs z
+
+
+```{r Table Exploration}
+ggplot(diamonds, aes(y=table)) + 
+  geom_histogram(col="black", 
+                 fill="green", 
+                  alpha = .8,
+                 binwidth = 1.5) +
+  labs(title='Histogram of Table') +
+  coord_flip() +
+  labs(y="Table", x="Frequency")
+```
+
+table plot
+
+```{r Depth Exploration}
+ggplot(diamonds, aes(y=depth)) + 
+  geom_histogram(col="black", 
+                 fill="red", 
+                  alpha = .8,
+                 binwidth = 1) +
+  coord_flip() +
+  labs(title='Histogram of Depth') +
+  labs(y="Depth", x="Frequency")
+```
+
+depth plot
+
+```{r Carat Exploration}
+ggplot(diamonds, aes(y=carat)) + 
+  geom_boxplot() + 
+  geom_boxplot(colour="black", fill="orange", outlier.colour="orange", outlier.size=5, alpha = 0.8) +
+  labs(title = 'Boxplot of Carat')+
+  labs(y="Carat")
+```
+
+carat plot
+
+### Price Exploration
+
+```{r Price Exploration}
+ggplot(diamonds, aes(y=price)) + 
+  geom_boxplot() + 
+  geom_boxplot(colour="black", fill="blue", outlier.colour="blue", outlier.size=5, alpha = 0.8) +
+  labs(title = 'Boxplot of Price')
+
+ggplot(diamonds, aes(y=price)) + 
+  geom_histogram(col="black", 
+                 fill="blue", 
+                  alpha = .8,
+                 binwidth = 300) +
+  coord_flip() +
+  labs(title='Histogram of Price') +
+  labs(y="Price", x="Frequency")
+
+qqnorm(diamonds$price, main="Q-Q plot of Price", col = 'blue', ylab = 'Price') 
+qqline(diamonds$price)
+
+```
+
+
+
+price plot
+
+
+
 ## Adam - Linear Regression to predict price
 
 
+
+### single variables
+
+``` {r single var models}
+modelcarat <- lm(price ~ carat,data=diamonds)
+modeldepth <- lm(price ~ depth,data=diamonds)
+modeltable <- lm(price ~ table,data=diamonds)
+modelx <- lm(price ~ x,data=diamonds)
+modely <- lm(price ~ y,data=diamonds)
+modelz <- lm(price ~ z,data=diamonds)
+
+```
+
+``` {r single var models 2, results = TRUE}
+loadPkg("sjPlot")
+loadPkg("sjmisc")
+loadPkg("sjlabelled")
+tab_model(modelcarat)
+tab_model(modeldepth)
+tab_model(modeltable)
+tab_model(modelx)
+tab_model(modely)
+tab_model(modelz)
+```
+
+``` {r single var models 2.5}
+anovaRes = anova(modelcarat,modelx,modely,modelz)
+xkabledply(anovaRes, title = "ANOVA comparison between the models")
+``` 
+
+
+``` {r single var models 3}
+loadPkg("modelr")
+df.with.predfin.from.model <- add_predictions(diamonds,modelcarat)
+head(df.with.predfin.from.model)
+loadPkg("ggplot2")
+ggplot(df.with.predfin.from.model,aes(price,pred))+geom_point(aes(price,pred), alpha =0.2)+geom_line(aes(pred), colour="red", size=1) + labs(title = "Carat Plot", x = "Price", y = "Prediction") + xlim(c(0, 20000))
+
+loadPkg("car")
+avPlots(modelcarat)
+```
+
+### multinumeric variables
+
+
+``` {r corrplot}
+diamondsnum =  subset(diamonds, select = c("price", "carat", "depth", "table", "x", "y", "z"))
+diamondscor = cor(diamondsnum) 
+loadPkg("corrplot")
+corrplot.mixed(diamondscor)
+```
+
+``` {r pairs plot}
+loadPkg("lattice") 
+pairs(diamondsnum[1:4])
+```
+
+``` {r multinumeric models, results = TRUE}
+modelcaratx <- lm(price ~ carat+x,data=diamonds)
+tab_model(modelcaratx)
+xkablevif(modelcaratx)
+```
+
+``` {r multinumeric models2, results = TRUE}
+modelcarattable <- lm(price ~ carat+table,data=diamonds)
+tab_model(modelcarattable)
+xkablevif(modelcarattable)
+```
+
+``` {r multinumeric models3, results = TRUE}
+modeldepthx <- lm(price ~ depth+x,data=diamonds)
+tab_model(modeldepthx)
+xkablevif(modeldepthx)
+```
+Its either a worse predictor, or has higher vif values
+
+There is no way to fix this from looking online
+
+
+### multi numeric+continious variables
+
+``` {r multi numeric+conitnious models, results = TRUE}
+modelcaratcut <- lm(price ~ carat+cut, data = diamonds)
+tab_model(modelcaratcut)
+xkablevif(modelcaratcut)
+``` 
+
+``` {r multi numeric+conitnious models2, results = TRUE}
+modelcaratclarity <- lm(price ~ carat+clarity, data = diamonds)
+tab_model(modelcaratclarity)
+xkablevif(modelcaratclarity)
+```
+
+This model is the best
+
+``` {r multi numeric+conitnious models3, results = TRUE}
+modelcaratcolor <- lm(price ~ carat+color, data = diamonds)
+tab_model(modelcaratcolor)
+xkablevif(modelcaratcolor)
+```
+
+``` {r multi numeric+conitnious models4, results = TRUE}
+modelcaratccc <- lm(price ~ carat+color+cut+clarity, data = diamonds)
+tab_model(modelcaratccc)
+xkablevif(modelcaratccc)
+```
+
+Now this model is the best
+
+``` {r caratccc plot}
+df.with.predfin.from.model <- add_predictions(diamonds,modelcaratccc)
+head(df.with.predfin.from.model)
+loadPkg("ggplot2")
+ggplot(df.with.predfin.from.model,aes(price,pred))+geom_point(aes(price,pred), alpha =0.2)+geom_line(aes(pred), colour="red", size=1) + labs(title = "Carat Plot", x = "Price", y = "Prediction") + xlim(c(0, 20000))
+```
+
+almost looks like a polynomial curve?
+
+### interaction terms
+
+``` {r interaction terms, results = TRUE}
+modelcaratccci <- lm(price ~ carat * clarity, data = diamonds)
+tab_model(modelcaratccci)
+xkablevif(modelcaratccci)
+```
+
+pretty good model
+
+``` {r interaction terms2, results = TRUE}
+modelcaratccci2 <- lm(price ~ carat + (color+cut+clarity)^2, data = diamonds)
+tab_model(modelcaratccci2)
+xkablevif(modelcaratccci2)
+```
+
+high VIF values
+
+``` {r interaction terms3, results = TRUE}
+modelcaratccci3 <- lm(price ~ (carat + clarity)^2, data = diamonds)
+tab_model(modelcaratccci3)
+xkablevif(modelcaratccci3)
+```
+
+pretty great again, but high VIF
+
+
+Nothing with interaction terms beats the carat + ccc model
+
+### feature selection
+
+```{r ft, results = TRUE}
+loadPkg("leaps")
+#This is essentially best fit 
+reg.best10 <- regsubsets(price~. , data = diamonds, nvmax = 10, nbest = 1, method = "exhaustive")  # leaps::regsubsets() - Model selection by exhaustive (default) search, forward or backward stepwise, or sequential replacement
+#The plot will show the Adjust R^2 when using the variables across the bottom
+plot(reg.best10, scale = "adjr2", main = "Exhaustive Adjusted R^2")
+summary(reg.best10)
+```
+
+all types of models look the same, so just stick to adjusted R squared
+
+```{r feature selection 2}
+reg.forward10 <- regsubsets(price~., data = diamonds, nvmax = 10, nbest = 1, method = "forward")
+plot(reg.forward10, scale = "adjr2", main = "Adjusted R^2")
+# summary(reg.forward10)
+```
+
+
+again all the same
+
+
+```{r feature selection 3}
+reg.forward10 <- regsubsets(price~., data = diamonds, nvmax = 10, nbest = 1, method = "backward")
+plot(reg.forward10, scale = "adjr2", main = "Backward Adjusted R^2")
+# summary(reg.forward10)
+```
+
+same
+
+
+```{r feature selection 4}
+reg.forward10 <- regsubsets(price~., data = diamonds, nvmax = 10, nbest = 1, method = "seqrep")
+plot(reg.forward10, scale = "adjr2", main = "Sequential Replacement Adjusted R^2")
+# summary(reg.forward10)
+```
+
+same
+
+All feature selection reflects our findings, and is all the same basically
 
 ## Suhas - PCR modeling to predict price
 
