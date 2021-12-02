@@ -47,19 +47,19 @@ colnames(diamonds)[1] = "ID"
 
 ## EDA Code
 
+### summary table
+
 ```{r, results = 'markup'}
 sum = xkablesummary(diamonds, title = "Summary of Diamonds")
 sum
 ```
 
-### summary table
+### Categorical Data Exploration
 
 ```{r Color Exploration}
 barplot(table(diamonds$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
 ```
 
-
-### Categorical Data Exploration
 
 color plot
 
@@ -171,6 +171,8 @@ price plot
 
 ### single variables
 
+one model for each individual
+
 ``` {r single var models}
 modelcarat <- lm(price ~ carat,data=diamonds)
 modeldepth <- lm(price ~ depth,data=diamonds)
@@ -208,14 +210,13 @@ tab_model(modely)
 tab_model(modelz)
 ```
 
-one model for each indidividual
+ANOVA of models
 
-``` {r single var models 2.5}
+``` {r single var models 2.5, res, results = 'markup'}
 anovaRes = anova(modelcarat,modelx,modely,modelz)
 xkabledply(anovaRes, title = "ANOVA comparison between the models")
 ``` 
 
-ANOVA of models
 
 ``` {r single var models 3}
 loadPkg("modelr")
@@ -243,9 +244,11 @@ corrplot.mixed(diamondscor)
 high correlation between many variables
 
 ``` {r pairs plot}
-loadPkg("lattice") 
-pairs(diamondsnum[1:4])
+#loadPkg("lattice") 
+#pairs(diamondsnum[1:4])
 ```
+
+removed the pairs plot for now cause I did not use in presentation and it takes too long to run
 
 ``` {r multinumeric models, results = TRUE}
 modelcaratx <- lm(price ~ carat+x,data=diamonds)
@@ -264,7 +267,7 @@ modeldepthx <- lm(price ~ depth+x,data=diamonds)
 tab_model(modeldepthx)
 xkablevif(modeldepthx)
 ```
-Its either a worse predictor, or has higher vif values
+Every multinumeric model is either a worse predictor, or has higher vif values
 
 There is no way to fix this from looking online
 
@@ -347,7 +350,6 @@ loadPkg("leaps")
 reg.best10 <- regsubsets(price~. , data = diamonds, nvmax = 10, nbest = 1, method = "exhaustive")  # leaps::regsubsets() - Model selection by exhaustive (default) search, forward or backward stepwise, or sequential replacement
 #The plot will show the Adjust R^2 when using the variables across the bottom
 plot(reg.best10, scale = "adjr2", main = "Exhaustive Adjusted R^2")
-summary(reg.best10)
 ```
 
 all types of models look the same, so just stick to adjusted R squared
@@ -379,13 +381,15 @@ plot(reg.forward10, scale = "adjr2", main = "Sequential Replacement Adjusted R^2
 
 same
 
-All feature selection reflects our findings, and is all the same basically
+All feature selections reflects our findings, and is all the same basically
+
+
 
 ## Suhas - PCR modeling to predict price
 
 
 
-## Solomon - Logistic Regression to predict cut
+## Solomon - Random Forest to predict cut
 
 
 
