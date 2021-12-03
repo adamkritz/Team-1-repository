@@ -393,10 +393,6 @@ diamondscont <- subset(diamonds, select = c ("carat", "depth", "table", "price",
 ```
 
 
-```{r, results='markup'}
-diamondscont1 <- subset(diamonds, select = c ("carat", "depth", "table", "price", "x", "y", "z"))
-```
-
 #Standardize the data
 ```{r, results='markup'}
 diamondscont <- as.data.frame(scale(diamondscont))
@@ -410,10 +406,40 @@ pcr_model <- pcr(price~., data = diamondscont,ncomp=6, validation = "CV")
 summary(pcr_model)
 ```
 
-# Linear regression model with 1 components 
+```{r, results='markup'}
+# We can see from the results of the PCR model that with just one component we can explain around 79 % of variance in price and as the components increase, the variance in price explained increases very marginally so it would make sense to build a model with just one variable. 
+```
+
+
+# Linear regression model with 1 component
 ```{r}
-linear_model_pcr_1 = lm(price~ carat + z   , data= diamondscont)
-summary(linear_model_pcr_1)
+linear_model_pcr_1a = lm(price~ x   , data= diamondscont)
+summary(linear_model_pcr_1a)
+```
+
+```{r}
+linear_model_pcr_1b = lm(price~ y   , data= diamondscont)
+summary(linear_model_pcr_1b)
+```
+
+```{r}
+linear_model_pcr_1c = lm(price~ z   , data= diamondscont)
+summary(linear_model_pcr_1c)
+```
+
+```{r}
+linear_model_pcr_1d = lm(price~ depth   , data= diamondscont)
+summary(linear_model_pcr_1d)
+```
+
+```{r}
+linear_model_pcr_1e = lm(price~ table   , data= diamondscont)
+summary(linear_model_pcr_1e)
+```
+
+```{r}
+linear_model_pcr_1f = lm(price~ carat   , data= diamondscont)
+summary(linear_model_pcr_1f)
 ```
 
 
