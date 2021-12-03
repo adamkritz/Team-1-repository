@@ -388,6 +388,23 @@ All feature selections reflects our findings, and is all the same basically
 ## Suhas - PCR modeling to predict price
 
 
+```{r, results='markup'}
+diamondscont <- subset(diamonds, select = c ("carat", "depth", "table", "price", "x", "y", "z"))
+```
+
+#Standardize the data
+```{r, results='markup'}
+diamondscont[1 : 3, 5:7] <- as.data.frame(scale(diamondscont[1 : 3, 5  : 7]))
+```
+
+```{r, results='markup'}
+library(pls)
+pcr_model <- pcr(price~., data = diamondscont, validation = "CV")
+summary(pcr_model)
+```
+
+# Conduct PCR 
+
 
 ## Solomon - Random Forest to predict cut
 
