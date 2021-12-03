@@ -397,13 +397,28 @@ diamondscont <- subset(diamonds, select = c ("carat", "depth", "table", "price",
 diamondscont[1 : 3, 5:7] <- as.data.frame(scale(diamondscont[1 : 3, 5  : 7]))
 ```
 
+# Conduct PCR 
+
 ```{r, results='markup'}
 library(pls)
-pcr_model <- pcr(price~., data = diamondscont, validation = "CV")
+pcr_model <- pcr(price~., data = diamondscont,ncomp=6, validation = "CV")
 summary(pcr_model)
 ```
 
-# Conduct PCR 
+# Linear regression model with 1 components 
+```{r}
+linear_model_pcr_1 = lm(price~ carat   , data= diamondscont)
+summary(linear_model_pcr_1)
+```
+
+
+# Linear regression model with 2 components 
+```{r}
+linear_model_pcr_2 = lm(price~ carat + x  , data= diamondscont)
+summary(linear_model_pcr_2)
+```
+
+
 
 
 ## Solomon - Random Forest to predict cut
