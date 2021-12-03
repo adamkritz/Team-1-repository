@@ -404,6 +404,7 @@ diamondscont <- as.data.frame(scale(diamondscont))
 library(pls)
 pcr_model <- pcr(price~., data = diamondscont,ncomp=6, validation = "CV")
 summary(pcr_model)
+validationplot(pcr_model)
 ```
 
 ```{r, results='markup'}
