@@ -445,11 +445,19 @@ summary(linear_model_pcr_1f)
 
 # Linear regression model with 2 components 
 ```{r}
-linear_model_pcr_2 = lm(price~ carat + x  , data= diamondscont)
+linear_model_pcr_2 = lm(price~ carat + y  , data= diamondscont)
 summary(linear_model_pcr_2)
+
+#calculate the vif value 
+xkablevif(linear_model_pcr_2)
 ```
 
-
+# Linear regression model with 3 components 
+```{r}
+linear_model_pcr_3 = lm(price~ carat + y + z , data= diamondscont)
+summary(linear_model_pcr_3)
+xkablevif(linear_model_pcr_3)
+```
 
 
 ## Solomon - Random Forest to predict cut
