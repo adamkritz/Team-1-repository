@@ -492,9 +492,25 @@ knn_pred <- knn(train = knn_training, test = knn_test, cl=trainLabels, k=7)
 KNNCross <- CrossTable(testLabels, knn_pred, prop.chisq = FALSE)
 ```
 
-
+# check different k values
 ```{r}
-
+ResultDf = data.frame( k=numeric(0), Total.Accuracy= numeric(0), row.names = NULL )
+for (kval in 3:15) {
+  knn_pred <- knn(train = knn_training, test = knn_test, cl=trainLabels, k=kval)
+  KNNCross <- CrossTable(testLabels, knn_pred, prop.chisq = FALSE)
+  print( paste("k = ", kval) )
+  KNNCross
+  # get confusion matrix
+  cm = confusionMatrix(knn_pred, reference = testLabels ) 
+  # get accuracy score
+  cmaccu = cm$overall['Accuracy']
+  print( paste("Total Accuracy = ", cmaccu ) )
+  # store into dataframe
+  cmt = data.frame(k=kval, Total.Accuracy = cmaccu, row.names = NULL )
+  ResultDf = rbind(ResultDf, cmt)
+  print( xkabledply(   as.matrix(cm), title = paste("ConfusionMatrix for k = ",kval ) ) )
+  print( xkabledply(data.frame(cm$byClass), title=paste("k = ",kval)) )
+}
 ```
 
 
