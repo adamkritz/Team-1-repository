@@ -461,8 +461,147 @@ xkablevif(linear_model_pcr_3)
 ```
 
 
-## Solomon - Random Forest to predict cut
+## Solomon - Random Forest Classification to predict cut
 
+In this section we will be using the Random Forest model to build a classification model to be able to effectively classify diamonds into 'Fair', 'Good', 'Very Good', 'Premium', 'Ideal' diamond cuts, using the base features.
+
+Prior to Random Forest Classification, Multi-nomial Logistic regression had been used but a very low accuracy score was found.
+
+We start by removing missing values and outliers to make a good classification.
+
+```{r preprocessing}
+mydiamonds=diamonds
+mydiamonds[ mydiamonds == "?"] <- NA
+colSums(is.na(mydiamonds))
+# str(mydiamonds)
+# boxplot(mydiamonds$price)
+# any(is.na.data.frame(mydiamonds_clean))
+mydiamonds_clean= subset(mydiamonds,!mydiamonds$price %in% boxplot.stats(mydiamonds$price)$out)
+```
+
+Upon removing outliers, `r nrow(mydiamonds)- nrow(mydiamonds_clean)` outliers were detected and removed.
+
+Next, we split our data set into training and testing set with 80% and 20% respectively.
+
+```{r train_test_split}
+library(randomForest)
+require(caTools)
+library(MASS)
+library(caret)
+set.seed(1)
+dataset= mydiamonds_clean[,2:11]
+test= createDataPartition(dataset$cut,p=.2, list= FALSE)
+data_train= dataset[-test,]
+data_test= dataset[test,]
+```
+
+### Multinomial Logistic Regression
+
+Before we dive into Random Forest Regression, lets perform a multinomial Logistic Regression and take a look at the accuracy score.
+
+```{r logisticReg}
+require(nnet)
+# Training the multinomial model
+multinom_model <- multinom(cut ~ ., data = data_test)
+
+# Checking the model
+summary(multinom_model)
+
+# Predicting the values for train dataset
+classPredicted <- predict(multinom_model, newdata = data_test, "class")
+
+# Confusion matrix
+library(caret)
+cmlogit=confusionMatrix(data_test$cut,classPredicted)
+```
+
+Logistic Regression has an accuracy score of `r round((sum(diag(cmlogit$table))/sum(cmlogit$table))*100,2)`%.
+
+### Random Forest Regression
+
+With Logsitic regression performing poorly, we will test Random Forest Regression.
+
+First, we tune the Random Forest Model to get the best `mtry` (number of variables sampled at each split).
+
+```{r tuningRF, results='markup'}
+# Tuning Random Forest to get the best mtry (number of variables random sampled as candidates at each split)
+tune= tuneRF(data_train[,-2],data_train[,2], stepFactor = 0.5, plot=TRUE,
+             ntreeTry=75,trace=TRUE, improve=0.05)
+
+```
+
+Note: `mtry` is the number of predictors sampled for splitting at each node.
+
+The chart above helps us choose the best `mtry` to get a minimal Out of Bag Error. Obviously, 6 is the best `mtry` with less than 22% OOB error.
+
+
+```{r rfc, results='markup'}
+
+rf<- randomForest(cut~ .,data=data_train,mtry=6, ntree=75) #fitting RandomForest Classification
+pred = predict(rf, newdata=data_test[,-2]) # Prediction on test set
+cm=confusionMatrix(data_test$cut,pred) #confusion matrix
+print(rf)
+```
+
+The random forest classifier has been modeled with mtry as 6 and ntree as 75..
+
+```{r, results='markup'}
+xkabledply(cm$table,title="Confusion Matrix")
+cm$overall
+```
+
+The confusion matrix is seen above. Also, we get an accuracy score of `r cm$overall[1]*100`% for the test dataset.
+
+```{r,results='markup'}
+plot(rf)
+```
+
+The graph above shows that as the trees increases the Out of Bag Error reduces. While a larger size of trees greater than 75 does not reduce the out of bag error significantly.
+
+```{r importance,results='markup'}
+round(importance(rf), 2)
+```
+
+```{r, results='markup'}
+# Mean Decrease in Gini is the average (mean) of a variable's total decrease in node impurity
+varImpPlot(rf)
+```
+
+The mean decrease in Gini coefficient is a measure of how each variable contributes to the homogeneity of the nodes and leaves in the resulting random forest. The higher the value of mean decrease Gini score, the higher the importance of the variable in the model.
+
+In the above chart, `table` and `depth` have the highest importance in the Random Forest model.
+
+```{r}
+set.seed(1)
+dataset2= mydiamonds_clean[,c(2,3,4,6,7,8,9,10,11)]
+test2= createDataPartition(dataset2$cut,p=.2, list= FALSE)
+data_train2= dataset2[-test2,]
+data_test2= dataset2[test2,]
+
+rf2<- randomForest(cut~ .,data=data_train2,mtry=6, ntree=75) #fitting RandomForest Classification
+pred2 = predict(rf2, newdata=data_test2[,-2]) # Prediction on test set
+cm2=confusionMatrix(data_test2$cut,pred2) #confusion matrix
+print(rf2)
+```
+
+Removing least mean decrease gini feature (clarity) increases the Out of Bag error by 0.1%. We will stick to the first random forest model for predicting diamond cut type with minimal out of bag error. 
+
+```{r check,results='markup'}
+check= data.frame()
+# c('accuracy','precision','sensitivity','specificity')
+check=rbind(check,c(round((sum(diag(cmlogit$table))/sum(cmlogit$table))*100,2)))
+check=rbind(check,c(round((sum(diag(cm$table))/sum(cm$table))*100,2)))
+rownames(check)=c('logistic','random forest')
+colnames(check)=c("Accuracy Score")
+check$AverageSensitiviy=c((sum(cmlogit$byClass[1:5])/5)*100,(sum(cm$byClass[1:5])/5)*100)
+check$AverageSpecificity=c((sum(cmlogit$byClass[6:10])/5)*100,(sum(cm$byClass[6:10])/5)*100)
+check$AveragePrecision=c((sum(cmlogit$byClass[21:25])/5)*100,(sum(cm$byClass[21:25])/5)*100)
+
+barplot(height=as.matrix(check),beside=TRUE,names.arg = c("Accuracy","Sensitivity","Specificity","Precision"),legend.text = c("Logistic","RandoForest"),col=c("blue","green"))
+
+```
+
+The barplot above gives us a pictorial view of how Random Forest surpasses Logistic regression for classifying diamond cut type.
 
 
 ## Huang - KNN modeling to predict cut
