@@ -513,14 +513,19 @@ for (kval in 3:15) {
 }
 ```
 
-
+# show different accuracy values
 ```{r}
-
+xkabledply(ResultDf, "Total Accuracy Summary")
 ```
 
-
+# draw "accuracy vs k" plot
 ```{r}
-
+loadPkg("ggplot2")
+ggplot(ResultDf,
+       aes(x = k, y = Total.Accuracy)) +
+  geom_line(color = "orange", size = 1.5) +
+  geom_point(size = 3) + 
+  labs(title = "accuracy vs k")
 ```
 
 
