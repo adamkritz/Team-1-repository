@@ -165,7 +165,7 @@ price plot
 
 
 
-## Adam - Linear Regression to predict price
+## Linear Regression to predict price
 
 
 
@@ -385,7 +385,7 @@ All feature selections reflects our findings, and is all the same basically
 
 
 
-## Suhas - PCR modeling to predict price
+## PCR modeling to predict price
 
 
 ```{r, results='markup'}
@@ -448,7 +448,7 @@ We can see from the above models that if we have to choose one variable to best 
 If we try to build a model with more than one variable as above, we can see that the adjusted r squared value of the model increases very slightly, which means that the variation in price is explained only a little better than the model with just one variable. If we see the vif values which checks the collinearity of the variable, we can see that all the continuous variables are highly collinear.
 
 
-## Solomon - Random Forest Classification to predict cut
+## Random Forest Classification to predict cut
 
 In this section we will be using the Random Forest model to build a classification model to be able to effectively classify diamonds into 'Fair', 'Good', 'Very Good', 'Premium', 'Ideal' diamond cuts, using the base features.
 
@@ -591,7 +591,7 @@ barplot(height=as.matrix(check),beside=TRUE,names.arg = c("Accuracy","Sensitivit
 The barplot above gives us a pictorial view of how Random Forest surpasses Logistic regression for classifying diamond cut type.
 
 
-## Huang - KNN modeling to predict cut
+## KNN modeling to predict cut
 
 # pick numeric columns only
 ```{r}
