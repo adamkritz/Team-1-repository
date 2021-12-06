@@ -33,7 +33,9 @@ options(scientific=T, digits = 3)
 # use scipen=999 to prevent scientific notation at all times
 ```
 
-# Midterm Code
+
+
+## Midterm Code
 
 ## Importing the Data
 
@@ -387,18 +389,22 @@ All feature selections reflects our findings, and is all the same basically
 
 ## PCR modeling to predict price
 
+We first subset the continuous variables from the dataframe to a new dataframe.
+
 
 ```{r, results='markup'}
 diamondscont <- subset(diamonds, select = c ("carat", "depth", "table", "price", "x", "y", "z"))
 ```
 
+This data is not scaled and hence we have to standardize the data.
 
-#Standardize the data
 ```{r, results='markup'}
 diamondscont <- as.data.frame(scale(diamondscont))
+head(diamondscont)
 ```
 
-# Conduct PCR 
+Running the PCR model using pls library : 
+
 
 ```{r, results='markup'}
 library(pls)
@@ -411,33 +417,33 @@ We can see from the results of the PCR model that with just one component we can
 
 
 
-# Linear regression model with 1 component
-```{r}
+### Linear regression model with 1 component
+```{r, results='markup'}
 linear_model_pcr_1a = lm(price~ x   , data= diamondscont)
 summary(linear_model_pcr_1a)
 ```
 
-```{r}
+```{r, results='markup'}
 linear_model_pcr_1b = lm(price~ y   , data= diamondscont)
 summary(linear_model_pcr_1b)
 ```
 
-```{r}
+```{r, results='markup'}
 linear_model_pcr_1c = lm(price~ z   , data= diamondscont)
 summary(linear_model_pcr_1c)
 ```
 
-```{r}
+```{r, results='markup'}
 linear_model_pcr_1d = lm(price~ depth   , data= diamondscont)
 summary(linear_model_pcr_1d)
 ```
 
-```{r}
+```{r, results='markup'}
 linear_model_pcr_1e = lm(price~ table   , data= diamondscont)
 summary(linear_model_pcr_1e)
 ```
 
-```{r}
+```{r, results='markup'}
 linear_model_pcr_1f = lm(price~ carat   , data= diamondscont)
 summary(linear_model_pcr_1f)
 ```
@@ -593,13 +599,13 @@ The barplot above gives us a pictorial view of how Random Forest surpasses Logis
 
 ## KNN modeling to predict cut
 
-# pick numeric columns only
+### pick numeric columns only
 ```{r}
 knndata = diamonds[,c(2,3,6,7,8,9,10,11)]
 knndata = as.data.frame(scale(knndata[,c(1,3,4,5,6,7,8)], center = TRUE, scale = TRUE))
 ```
 
-# split data set
+### split data set
 ```{r}
 set.seed(1000)
 knn_sample <- sample(2, nrow(knndata), replace=TRUE, prob=c(0.75, 0.25))
@@ -609,7 +615,7 @@ trainLabels <- diamonds[knn_sample==1, 3]
 testLabels <- diamonds[knn_sample==2, 3]
 ```
 
-# build KNN model with K = 7
+### build KNN model with K = 7
 ```{r}
 loadPkg("FNN")
 loadPkg("gmodels")
@@ -618,7 +624,7 @@ knn_pred <- knn(train = knn_training, test = knn_test, cl=trainLabels, k=7)
 KNNCross <- CrossTable(testLabels, knn_pred, prop.chisq = FALSE)
 ```
 
-# check different k values
+### check different k values
 ```{r}
 ResultDf = data.frame( k=numeric(0), Total.Accuracy= numeric(0), row.names = NULL )
 for (kval in 3:15) {
@@ -639,12 +645,12 @@ for (kval in 3:15) {
 }
 ```
 
-# show different accuracy values
+### show different accuracy values
 ```{r}
 xkabledply(ResultDf, "Total Accuracy Summary")
 ```
 
-# draw "accuracy vs k" plot
+### draw "accuracy vs k" plot
 ```{r}
 loadPkg("ggplot2")
 ggplot(ResultDf,
@@ -655,8 +661,5 @@ ggplot(ResultDf,
 ```
 
 
-```{r}
-
-```
 
 
