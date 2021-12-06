@@ -591,7 +591,7 @@ barplot(height=as.matrix(check),beside=TRUE,names.arg = c("Accuracy","Sensitivit
 The barplot above gives us a pictorial view of how Random Forest surpasses Logistic regression for classifying diamond cut type.
 
 
-## KNN modeling to predict cut
+## KNN modeling to predict cut  
 
 We want to build some KNN models to help cutting workers to decide which cutting method should be used on which diamond.  
 # pick numeric columns only  
@@ -612,7 +612,7 @@ testLabels <- diamonds[knn_sample==2, 3]
 ```
 The whole data set has been splitted to training set and testing set as 3:1.  
 
-# build KNN model with K = 7
+# build KNN model with K = 7  
 ```{r results='markup'}
 loadPkg("FNN")
 loadPkg("gmodels")
@@ -623,7 +623,7 @@ KNNCross
 ```
 Here is the result of KNN model when K is equal to 7.  
 
-# check different k values  
+# check different k values   
 We also checked different K values.  
 ```{r}
 ResultDf = data.frame( k=numeric(0), Total.Accuracy= numeric(0), row.names = NULL )
@@ -645,13 +645,13 @@ for (kval in 3:15) {
 }
 ```
 
-# show different accuracy values
+# show different accuracy values  
 ```{r results='markup'}
 xkabledply(ResultDf, "Total Accuracy Summary")
 ```
 Above is the accuracy scores of different K values.  
 
-# draw "accuracy vs k" plot
+# draw "accuracy vs k" plot  
 ```{r}
 ResultDf2 = data.frame( k=numeric(0), Total.Accuracy= numeric(0), row.names = NULL )
 for (kval in 1:20) {
