@@ -608,8 +608,8 @@ The barplot above gives us a pictorial view of how Random Forest surpasses Logis
 
 # pick numeric columns only
 ```{r}
-knndata = diamonds[,c(2,3,6,7,8,9,10,11)]
-knndata = as.data.frame(scale(knndata[,c(1,3,4,5,6,7,8)], center = TRUE, scale = TRUE))
+knndata = diamonds[,c(2,3,6,7,9,10,11)]
+knndata = as.data.frame(scale(knndata[,c(1,3,4,5,6,7)], center = TRUE, scale = TRUE))
 ```
 
 # split data set
@@ -659,8 +659,19 @@ xkabledply(ResultDf, "Total Accuracy Summary")
 
 # draw "accuracy vs k" plot
 ```{r}
+ResultDf2 = data.frame( k=numeric(0), Total.Accuracy= numeric(0), row.names = NULL )
+for (kval in 1:20) {
+  knn_pred <- knn(train = knn_training, test = knn_test, cl=trainLabels, k=2*kval+1)
+  cm = confusionMatrix(knn_pred, reference = testLabels ) 
+  cmaccu = cm$overall['Accuracy']
+  cmt = data.frame(k=2*kval+1, Total.Accuracy = cmaccu, row.names = NULL )
+  ResultDf2 = rbind(ResultDf2, cmt)}
+```
+
+
+```{r}
 loadPkg("ggplot2")
-ggplot(ResultDf,
+ggplot(ResultDf2,
        aes(x = k, y = Total.Accuracy)) +
   geom_line(color = "orange", size = 1.5) +
   geom_point(size = 3) + 
