@@ -407,9 +407,8 @@ summary(pcr_model)
 validationplot(pcr_model)
 ```
 
-```{r, results='markup'}
-# We can see from the results of the PCR model that with just one component we can explain around 79 % of variance in price and as the components increase, the variance in price explained increases very marginally so it would make sense to build a model with just one variable. 
-```
+We can see from the results of the PCR model that with just one component we can explain around 79 % of variation in price and as the components increase, the variation in price explained increases very marginally so it would make sense to build a model with just one variable. 
+
 
 
 # Linear regression model with 1 component
@@ -443,22 +442,10 @@ linear_model_pcr_1f = lm(price~ carat   , data= diamondscont)
 summary(linear_model_pcr_1f)
 ```
 
+We can see from the above models that if we have to choose one variable to best explain the variation it price, it has to be the carat of the diamond because it has the highest adjusted r squared value among the other variables.
 
-# Linear regression model with 2 components 
-```{r}
-linear_model_pcr_2 = lm(price~ carat + y  , data= diamondscont)
-summary(linear_model_pcr_2)
 
-#calculate the vif value 
-xkablevif(linear_model_pcr_2)
-```
-
-# Linear regression model with 3 components 
-```{r}
-linear_model_pcr_3 = lm(price~ carat + y + z , data= diamondscont)
-summary(linear_model_pcr_3)
-xkablevif(linear_model_pcr_3)
-```
+If we try to build a model with more than one variable as above, we can see that the adjusted r squared value of the model increases very slightly, which means that the variation in price is explained only a little better than the model with just one variable. If we see the vif values which checks the collinearity of the variable, we can see that all the continuous variables are highly collinear.
 
 
 ## Solomon - Random Forest Classification to predict cut
