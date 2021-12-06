@@ -675,7 +675,8 @@ ggplot(ResultDf2,
        aes(x = k, y = Total.Accuracy)) +
   geom_line(color = "orange", size = 1.5) +
   geom_point(size = 3) + 
-  labs(title = "accuracy vs k")
+  labs(title = "accuracy vs k")+ 
+  theme_bw() + theme(panel.grid=element_blank())
 ```
 
 
