@@ -411,10 +411,14 @@ library(pls)
 pcr_model <- pcr(price~., data = diamondscont,ncomp=6, validation = "CV")
 summary(pcr_model)
 validationplot(pcr_model)
+pcrcomp <- prcomp(diamondscont, scale = TRUE)
+summary(pcrcomp)
+pcrcomp$rotation
 ```
 
 We can see from the results of the PCR model that with just one component we can explain around 79 % of variation in price and as the components increase, the variation in price explained increases very marginally so it would make sense to build a model with just one variable. 
 
+We will try to build a linear model with one variable from the PC1. x, y, z and carat have highest probabilities.
 
 
 ### Linear regression model with 1 component
