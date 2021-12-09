@@ -1,0 +1,829 @@
+---
+title: "Team 1 Final Project Report"
+author: "Team 1 (Names: Adam Kritz, Osemekhian Ehilen, Suhas Buravalla, Huang He)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r init, include=F}
+# The package "ezids" (EZ Intro to Data Science) includes a lot of the helper functions we developed for the course. 
+# Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
+library(ezids)
+```
+
+```{r setup, include=FALSE}
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+# knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+knitr::opts_chunk$set(warning = F, results = "hide", message = F)
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+# ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
+# use scipen=999 to prevent scientific notation at all times
+```
+
+# Final Project
+
+## Background
+
+### Motivation
+
+Our team decided to return to the diamonds dataset for the final project. With our knowledge from the midterm, we are now looking to start predicting different characteristics of diamonds. We are still interested in diamond price and cut, similar to the midterm, however, this time we are going to use modelling to make our own predictions about price and cut. Our research will continue to enable people to better understand diamonds and make educated decisions when buying diamonds.
+
+### Dataset Refresher
+
+[Here is a link to our dataset](https://www.kaggle.com/shivam2503/diamonds)
+
+Our diamonds dataset comes from Kaggle. Our data was originally sourced from Tiffany & Co.'s snapshot pricelist from 2017. Tiffany and Co. is a large American luxury jewelry corporation, so we felt their data would be applicable to those looking to buy diamonds.
+
+Our dataset has 53,940 observations in it. There are ten unique variables and one ID number for each diamond. 
+
+There are three categorical variables that are all ordinal variables:
+
+* Cut - the quality of the cut of the diamond
+    + There are five levels of cut, from worst to best: Fair, Good, Very Good, Premium, Ideal
+    
+* Color - the quality of the color of the diamond
+    + There are seven levels of color, from worst to best: J, I, H, G, F, E, D
+    
+* Clarity - the quality of the clarity of the diamond
+    + There are eight levels of clarity, from worst to best: I1, SI2, SI1, VS2, VS1, VVS2, VVS1, IF
+    
+There are also seven continuous variables that are all ratio variables:
+
+* Price - the price of the diamond in USD
+    + Ranges from 326USD - 18,823USD
+    
+* Carat - the weight of the diamond
+    + Ranges from 0.2 - 5.01
+    
+* x - the length of the diamond
+    + Ranges from 0 - 10.74
+    
+* y - the width of the diamond
+    + Ranges from 0 - 58.9
+        
+* z - the depth of the diamond
+    + Ranges from 0 - 31.8
+        
+* Depth - the total depth percentage of the diamond
+    + Calculated as: 2 * z / (x + y)
+    + Ranges from 43 - 79
+        
+* Table - the width of top of diamond relative to widest point
+    + Ranges from 43 - 95
+    
+Overall, the dataset is relatively clean. However, there are still a few abnormalities in the data.
+
+* There are outliers in a couple of the variables
+* There are a few diamonds that have zero values in x, y, or z. This is clearly a mistake, as all diamonds are three dimensional objects.
+
+These issues are addressed in future sections when they present themselves.
+
+### Prior Work on the Diamonds Dataset Refresher
+
+The diamonds dataset is an extremely popular dataset, so there has been plenty of work done on it. Much of this work is done through machine learning or more advanced statistical techniques that are hard for the average person to understand. Our group specifically wanted to create an easy to understand R Markdown file that has clear results from our modelling so the average diamond buyer could understand it.
+
+### SMART Question Development
+
+For the final project, we wanted to use a wide variety of models to predict both price and cut. We researched multiple different kinds of models, and eventually settled on four models to use. Within each of these models, we had questions we wanted to answer throughout the modeling process.
+
+* Linear Model for price
+    + What is the best single variable model?
+    + What is the best multi variable model with only numeric variables?
+    + What is the best model using numeric and categorical variables
+    + Can interaction terms or feature selection help to create a better model?
+    
+We had done a little bit of work on the linear model in the midterm, but we are now interested in improving on the model by using categorical variables. We are also interested in using the model for predictions. The first two questions of the linear model are a refresher from the midterm, and the last three employ our knew knowledge.
+
+* Principal Component Regression (PCR) for price
+    + Which of the following variables exhibiting multicollinearity can be eliminated for regression after PCA : x, y, z, table, carat and depth?
+    
+PCR is a newer modelling technique we are interested in, and we hope it is able to work in tandem with the linear model to predict price.
+
+* Random Forest Classification for cut
+    + How does a random forest classifier compare to logistic regression when it comes to classifying diamonds based on cut?
+    + How can we reduce out of bag error for the random forest model?
+    + What is the appropriate number of trees for the model
+    + Which features are the most important in a random forest model?
+    
+Initially we planned to do a logistic regression model, however it performed quite poorly. Instead, we decided to go with a random forest model, and compare it against logistic regression in the process of our research.
+
+* K-Nearest Neighbor (KNN) Classification for cut
+    + What is the optimal K value for a KNN classifier?
+    
+KNN classifier is another new modelling technique that can be used to classify diamonds based on their cut.
+
+These SMART questions will guide us through our research and allow us to create the best models for classifying diamonds.
+    
+## Importing the Data
+
+Here we import the data, set the index to ID, and set the ordinal variables to factors with order = T. 
+
+```{r read the dataset}
+diamonds = data.frame(read.csv("diamonds.csv"))
+diamonds$color = factor(diamonds$color, order=T, levels = c('J', 'I', 'H', 'G', 'F', 'E', 'D'))
+diamonds$clarity = factor(diamonds$clarity, order=T, levels = c('I1', 'SI2', 'SI1', 'VS2', 'VS1', 'VVS2', 'VVS1', 'IF'))
+diamonds$cut = factor(diamonds$cut, order=T, levels = c('Fair', 'Good', 'Very Good', 'Premium', 'Ideal'))
+
+rownames(diamonds) = diamonds$X
+diamonds = subset(diamonds, select = -X)
+```
+
+## Explaratory Data Analysis Refresher
+
+### Full Summary
+
+```{r, results = 'markup'}
+sum = xkablesummary(diamonds, title = "Summary of Diamonds")
+sum
+```
+
+Here we can see a full summary of the diamonds dataset. In order to better understand the data, let's look at each variable individually.
+
+### Categorical Data Exploration
+
+In this section we will look at some plots of categorical data
+
+```{r Color Exploration}
+barplot(table(diamonds$color), col = c(2, 3, 4, 7, 6, 8, 9), main = 'Barplot of Color', xlab = "Color", ylab = "Frequency")
+```
+
+Beginning with color, we can see that the G rank has the highest quantity of diamonds, at `r length(which(diamonds$color=='G'))`, and J has the lowest quantity of diamonds at `length(which(diamonds$color=='J'))`. Overall, there seems to be more diamonds near the middle color quality.
+
+```{r Clarity Exploration}
+barplot(table(diamonds$clarity), col = c(2, 3, 4, 7, 6, 8, 9, 5), main = 'Barplot of Clarity', xlab = "Clarity", ylab = "Frequency")
+```
+
+Clarity tells a similar story. In this case, the SI1 level has the most diamonds, at `r length(which(diamonds$clarity =='SI1'))`. I1 has the least at `r length(which(diamonds$clarity=='IF'))`. Again, there are the most diamonds at the middle to lower ranks of clarity than at the extremes.
+
+```{r Cut Exploration}
+barplot(table(diamonds$cut), col = c(6, 7, 8, 3, 4), main = 'Barplot of Cut', xlab = "Cut", ylab = "Frequency")
+
+cut_count = dplyr::count(diamonds, cut)
+colnames(cut_count)[colnames(cut_count) == 'cut'] <- 'Cut'
+cut_count$n = cut_count$n/sum(cut_count$n)
+
+loadPkg("ggplot2")
+
+ggplot(cut_count, aes(x = "", y = n, fill = Cut)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  geom_text(size = 4, aes(label = paste0(round(n, 2), "")), position = position_stack(vjust = 0.5))+
+  scale_fill_manual(values = c(6, 7, 8, 3, 4))+
+  labs(title='Pie Chart of Cut')
+```
+
+Cut has a different spread compared to the other two variables. In this case, the highest quantity of diamonds, `r length(which(diamonds$cut =='Ideal'))`, are located at the top at the Ideal level. The least are located in the Fair level, only containing `r length(which(diamonds$cut =='Fair'))` diamonds. As the level of cut increases, so do the quantity of diamonds in that level.
+
+To better visualize the differences in cut, we also created a pie chart. Ideal diamonds make up 40% of the data. If you were to combine all Fair, Good, and Premium diamonds, there would still be more Ideal diamonds. This vast discrepancy should be noted when looking at the coming research.
+
+### Continious Data Exploration
+
+In this section we will look at all the continuous variables besides price.
+
+```{r Length, Size, Depth Exploration}
+diaNO = subset(diamonds, x > 0 & y > 0 & z > 0 & y <30 & z <30)
+ggplot(diaNO, aes(x, y, color=z)) +
+  geom_point(size = 8, alpha = 0.6) +
+  ggtitle('Y versus X versus Z for Diamonds (Outliers Removed)') +
+  scale_color_gradient2(midpoint = 5, low="blue", mid="green", high="red")
+```
+
+Here we can see a plot of x, y, and z, or the length, width, and depth of diamonds. A few outliers were removed for this plot, so there are no values at zero or above thirty, in order to improve the readability of the plot. This plot shows a general trend in the data, that x, y, and z all increase and decrease together. In other words, higher x means higher y means higher z.
+
+```{r Table Exploration}
+ggplot(diamonds, aes(y=table)) + 
+  geom_histogram(col="black", 
+                 fill="green", 
+                  alpha = .8,
+                 binwidth = 1.5) +
+  labs(title='Histogram of Table') +
+  coord_flip() +
+  labs(y="Table", x="Frequency")
+```
+
+Table is the first of two extremely centralized variables, as can be seen from the histogram. The quantity of diamonds on the edges is so small, it cannot even be seen. The mean of table is `r mean(diamonds$table)` and the standard deviation is `r sd(diamonds$table)`, which is reflected in the histogram.
+
+```{r Depth Exploration}
+ggplot(diamonds, aes(y=depth)) + 
+  geom_histogram(col="black", 
+                 fill="red", 
+                  alpha = .8,
+                 binwidth = 1) +
+  coord_flip() +
+  labs(title='Histogram of Depth') +
+  labs(y="Depth", x="Frequency")
+```
+
+Depth is the second of the extremely centralized variables. This is reflected again in the mean, `r mean(diamonds$depth)`, and the standard deviation, `r sd(diamonds$depth)`. This can also be seen in the histogram, with all of the data extremely centralized around the mean.
+
+```{r Carat Exploration}
+ggplot(diamonds, aes(y=carat)) + 
+  geom_boxplot() + 
+  geom_boxplot(colour="black", fill="orange", outlier.colour="orange", outlier.size=5, alpha = 0.8) +
+  labs(title = 'Boxplot of Carat')+
+  labs(y="Carat")
+```
+
+Carat has a much different spread than table and depth, though the values are still grouped together. However, this time they are near the bottom, as every value above 2 is considered an outlier for carat. Overall, the carat distribution is extremely right skewed. The mean of carat is `r mean(diamonds$carat)` and the standard deviation is `r sd(diamonds$carat)`.
+
+### Price Exploration
+
+Here are a couple plots on price.
+
+```{r Price Exploration}
+ggplot(diamonds, aes(y=price)) + 
+  geom_boxplot() + 
+  geom_boxplot(colour="black", fill="blue", outlier.colour="blue", outlier.size=5, alpha = 0.8) +
+  labs(title = 'Boxplot of Price')
+
+ggplot(diamonds, aes(y=price)) + 
+  geom_histogram(col="black", 
+                 fill="blue", 
+                  alpha = .8,
+                 binwidth = 300) +
+  coord_flip() +
+  labs(title='Histogram of Price') +
+  labs(y="Price", x="Frequency")
+
+qqnorm(diamonds$price, main="Q-Q plot of Price", col = 'blue', ylab = 'Price') 
+qqline(diamonds$price)
+
+```
+
+Price has a similar distribution to carat, with most of the diamonds have a relatively low price. There is a large number of outliers over the thirteen thousand mark due to the low centralization of the data. From the histogram, it can also be seen that the data is right-skewed, similar to carat. Lastly, the Q-Q plot shows that price is most definitely not normal, which will be taken into account when doing tests. The mean of price is `r mean(diamonds$price)` and the standard deviation of price is `r sd(diamonds$price)`.
+
+With the exploratory data analysis complete, we can move onto the SMART questions.
+
+## Data Preprocessing
+
+### Data Cleaning
+
+Unlike the midterm, we need to do a little more cleaning on the data this time in order to do the modelling.
+
+We will be uniformly removing all the outliers in the numerical variables in the dataset to avoid any modelling issues. We removed any outliers in continious variables with a z-score of less then -3.5 or over 3.5. This removed any clear outliers from the data.
+
+``` {r data preprocess}
+diamondscontT = subset(diamonds, select = c("carat", "depth", "table", "price", "x", "y", "z"))
+diamondscat = subset(diamonds, select = c("cut", "color", "clarity"))
+
+z_scores = as.data.frame(sapply(diamondscontT, function(diamondscontT)  (abs(diamondscontT-mean(diamondscontT))/sd(diamondscontT))))
+diamondscontT2 = z_scores[!rowSums(z_scores>3.5), ]
+
+RN = row.names(diamondscontT2)
+diamonds_No_Out = diamondscontT[rownames(diamondscontT) %in% RN, ]
+diamonds_No_OutCat = diamondscat[rownames(diamondscat) %in% RN, ]
+
+diamondsNO = cbind(diamonds_No_Out, diamonds_No_OutCat)
+
+diamondsNo_Out_SC = as.data.frame(scale(diamonds_No_Out, center = TRUE, scale = TRUE))
+
+diamondsNO_SC = cbind(diamondsNo_Out_SC, diamonds_No_OutCat)
+```
+
+
+### Train-Test Split
+
+Since we are creating models, we also need to conduct a train-test split on our data, so we can predict on the testing set. This is not 100% necessary for some of the models, but we decided it would be better to have a uniform train test split for everything. We are going to split the data 0.8 for training and 0.2 for testing. We also set the seed of R to make our results replicable. 
+
+We also be scaling the data for the PCR and KNN models, as they require scaling.
+
+``` {r data traint}
+
+set.seed(1)
+samp1 = sample(2, nrow(diamondsNO), replace=TRUE, prob=c(0.8, 0.2))
+diamondsNO_train = diamondsNO[samp1==1, ]
+diamondsNO_test = diamondsNO[samp1==2, ]
+diamondsNO_trainCutLabel = diamondsNO[samp1==1, 8]
+diamondsNO_testCutLabel = diamondsNO[samp1==2, 8]
+diamondsNO_trainPriceLabel = diamondsNO[samp1==1, 4]
+diamondsNO_testPriceLabel = diamondsNO[samp1==2, 4]
+
+diamondsNO_SC_train = diamondsNO_SC[samp1==1, ]
+diamondsNO_SC_test = diamondsNO_SC[samp1==2, ]
+diamondsNO_SC_trainCutLabel = diamondsNO_SC[samp1 == 1, 8]
+diamondsNO_SC_testCutLabel = diamondsNO_SC[samp1 == 2, 8]
+diamondsNO_SC_trainPriceLabel = diamondsNO_SC[samp1 == 1, 4]
+diamondsNO_SC_testPriceLabel = diamondsNO_SC[samp1 == 2, 4]
+
+```
+
+Upon removing outliers, `r nrow(z_scores)- nrow(diamondscontT2)` outliers were detected and removed.
+
+
+
+## Linear Regression to predict price
+
+
+
+### single variables
+
+one model for each individual
+
+``` {r single var models}
+modelcarat <- lm(price ~ carat,data=diamondsNO_train)
+modeldepth <- lm(price ~ depth,data=diamondsNO_train)
+modeltable <- lm(price ~ table,data=diamondsNO_train)
+modelx <- lm(price ~ x,data=diamondsNO_train)
+modely <- lm(price ~ y,data=diamondsNO_train)
+modelz <- lm(price ~ z,data=diamondsNO_train)
+
+```
+
+``` {r single var models 2, results = TRUE}
+loadPkg("sjPlot")
+loadPkg("sjmisc")
+loadPkg("sjlabelled")
+tab_model(modelcarat)
+```
+
+``` {r single var models 2.01, results = TRUE}
+tab_model(modeldepth)
+```
+
+``` {r single var models 2.02, results = TRUE}
+tab_model(modeltable)
+```
+
+``` {r single var models 2.03, results = TRUE}
+tab_model(modelx)
+```
+
+``` {r single var models 2.04, results = TRUE}
+tab_model(modely)
+```
+
+``` {r single var models 2.05, results = TRUE}
+tab_model(modelz)
+```
+
+ANOVA of models
+
+``` {r single var models 2.5, res, results = 'markup'}
+anovaRes = anova(modelcarat,modelx,modely,modelz)
+xkabledply(anovaRes, title = "ANOVA comparison between the models")
+``` 
+
+
+``` {r single var models 3}
+loadPkg("modelr")
+df.with.predfin.from.model = add_predictions(diamondsNO_test,modelcarat)
+head(df.with.predfin.from.model)
+loadPkg("ggplot2")
+ggplot(df.with.predfin.from.model,aes(price,pred))+geom_point(aes(price,pred), alpha =0.2)+geom_line(aes(pred), colour="red", size=1) + labs(title = "Carat Linear Model to Predict Price", x = "Price", y = "Prediction") + xlim(c(0, 20000))
+```
+
+Carat is the best singular model
+
+### multinumeric variables
+
+
+``` {r corrplot}
+diamondsnum =  subset(diamondsNO, select = c("price", "carat", "depth", "table", "x", "y", "z"))
+diamondscor = cor(diamondsnum) 
+loadPkg("corrplot")
+corrplot.mixed(diamondscor)
+```
+
+high correlation between many variables
+
+``` {r pairs plot}
+#loadPkg("lattice") 
+#pairs(diamondsnum[1:4])
+```
+
+removed the pairs plot for now cause I did not use in presentation and it takes too long to run
+
+``` {r multinumeric models, results = TRUE}
+modelcaratx <- lm(price ~ carat+x,data=diamondsNO_train)
+tab_model(modelcaratx)
+xkablevif(modelcaratx)
+```
+
+``` {r multinumeric models2, results = TRUE}
+modelcarattable <- lm(price ~ carat+table,data=diamondsNO_train)
+tab_model(modelcarattable)
+xkablevif(modelcarattable)
+```
+
+``` {r multinumeric models3, results = TRUE}
+modeldepthx <- lm(price ~ depth+x,data=diamondsNO_train)
+tab_model(modeldepthx)
+xkablevif(modeldepthx)
+```
+Every multinumeric model is either a worse predictor, or has higher vif values
+
+There is no way to fix this from looking online
+
+
+### multi numeric+continious variables
+
+trying out different models
+
+``` {r multi numeric+conitnious models, results = TRUE}
+modelcaratcut <- lm(price ~ carat+cut, data = diamondsNO_train)
+tab_model(modelcaratcut)
+xkablevif(modelcaratcut)
+``` 
+
+``` {r multi numeric+conitnious models2, results = TRUE}
+modelcaratclarity <- lm(price ~ carat+clarity, data = diamondsNO_train)
+tab_model(modelcaratclarity)
+xkablevif(modelcaratclarity)
+```
+
+This model is the best
+
+``` {r multi numeric+conitnious models3, results = TRUE}
+modelcaratcolor <- lm(price ~ carat+color, data = diamondsNO_train)
+tab_model(modelcaratcolor)
+xkablevif(modelcaratcolor)
+```
+
+``` {r multi numeric+conitnious models4, results = TRUE}
+modelcaratccc <- lm(price ~ carat+color+cut+clarity, data = diamondsNO_train)
+tab_model(modelcaratccc)
+xkablevif(modelcaratccc)
+```
+
+Now this model is the best
+
+``` {r caratccc plot}
+df.with.predfin.from.model <- add_predictions(diamondsNO_test,modelcaratccc)
+head(df.with.predfin.from.model)
+loadPkg("ggplot2")
+ggplot(df.with.predfin.from.model,aes(price,pred))+geom_point(aes(price,pred), alpha =0.2)+geom_line(aes(pred), colour="red", size=1) + labs(title = "Carat + Color + Cut + Clarity Linear Model", x = "Price", y = "Prediction") + xlim(c(0, 20000))
+```
+
+almost looks like a polynomial curve?
+
+### interaction terms
+
+``` {r interaction terms, results = TRUE}
+modelcaratccci <- lm(price ~ carat * clarity, data = diamondsNO_train)
+tab_model(modelcaratccci)
+xkablevif(modelcaratccci)
+```
+
+pretty good model
+
+``` {r interaction terms2, results = TRUE}
+modelcaratccci2 <- lm(price ~ carat + (color+cut+clarity)^2, data = diamondsNO_train)
+tab_model(modelcaratccci2)
+xkablevif(modelcaratccci2)
+```
+
+high VIF values
+
+``` {r interaction terms3, results = TRUE}
+modelcaratccci3 <- lm(price ~ (carat + clarity)^2, data = diamondsNO_train)
+tab_model(modelcaratccci3)
+xkablevif(modelcaratccci3)
+```
+
+pretty great again, but high VIF
+
+
+Nothing with interaction terms beats the carat + ccc model
+
+### feature selection
+
+```{r ft, results = TRUE}
+loadPkg("leaps")
+#This is essentially best fit 
+reg.best10 <- regsubsets(price~. , data = diamondsNO_train, nvmax = 10, nbest = 1, method = "exhaustive")  # leaps::regsubsets() - Model selection by exhaustive (default) search, forward or backward stepwise, or sequential replacement
+#The plot will show the Adjust R^2 when using the variables across the bottom
+plot(reg.best10, scale = "adjr2", main = "Exhaustive Adjusted R^2")
+```
+
+all types of models look the same, so just stick to adjusted R squared
+
+```{r feature selection 2}
+reg.forward10 <- regsubsets(price~., data = diamondsNO_train, nvmax = 10, nbest = 1, method = "forward")
+plot(reg.forward10, scale = "adjr2", main = "Forward Adjusted R^2")
+# summary(reg.forward10)
+```
+
+
+again all the same
+
+
+```{r feature selection 3}
+reg.forward10 <- regsubsets(price~., data = diamondsNO_train, nvmax = 10, nbest = 1, method = "backward")
+plot(reg.forward10, scale = "adjr2", main = "Backward Adjusted R^2")
+# summary(reg.forward10)
+```
+
+same
+
+
+```{r feature selection 4}
+reg.forward10 <- regsubsets(price~., data = diamondsNO_train, nvmax = 10, nbest = 1, method = "seqrep")
+plot(reg.forward10, scale = "adjr2", main = "Sequential Replacement Adjusted R^2")
+# summary(reg.forward10)
+```
+
+same
+
+All feature selections reflects our findings, and is all the same basically
+
+Finally, let's test the accuracy of the best linear model on the test data.
+
+```{r testing}
+
+```
+
+
+## PCR modeling to predict price
+
+We first subset the continuous variables from the dataframe to a new dataframe.
+
+
+```{r, results='markup'}
+diamondscont <- subset(diamondsNO_SC_train, select = c ("carat", "depth", "table", "price", "x", "y", "z"))
+```
+
+
+Running the PCR model using pls library : 
+
+
+```{r, results='markup'}
+library(pls)
+pcr_model <- pcr(price~., data = diamondscont,ncomp=6, validation = "CV")
+summary(pcr_model)
+validationplot(pcr_model)
+pcrcomp <- prcomp(diamondscont, scale = TRUE)
+summary(pcrcomp)
+pcrcomp$rotation
+```
+
+We can see from the results of the PCR model that with just one component we can explain around 79 % of variation in price and as the components increase, the variation in price explained increases very marginally so it would make sense to build a model with just one variable. 
+
+We will try to build a linear model with one variable from the PC1. x, y, z and carat have highest probabilities.
+
+
+### Linear regression model with 1 component
+```{r, results='markup'}
+linear_model_pcr_1a = lm(price~ x   , data= diamondsNO_train)
+summary(linear_model_pcr_1a)
+```
+
+```{r, results='markup'}
+linear_model_pcr_1b = lm(price~ y   , data= diamondsNO_train)
+summary(linear_model_pcr_1b)
+```
+
+```{r, results='markup'}
+linear_model_pcr_1c = lm(price~ z   , data= diamondsNO_train)
+summary(linear_model_pcr_1c)
+```
+
+```{r, results='markup'}
+linear_model_pcr_1d = lm(price~ depth   , data= diamondsNO_train)
+summary(linear_model_pcr_1d)
+```
+
+```{r, results='markup'}
+linear_model_pcr_1e = lm(price~ table   , data= diamondsNO_train)
+summary(linear_model_pcr_1e)
+```
+
+```{r, results='markup'}
+linear_model_pcr_1f = lm(price~ carat   , data= diamondsNO_train)
+summary(linear_model_pcr_1f)
+```
+
+We can see from the above models that if we have to choose one variable to best explain the variation it price, it has to be the carat of the diamond because it has the highest adjusted r squared value among the other variables.
+
+
+If we try to build a model with more than one variable as above, we can see that the adjusted r squared value of the model increases very slightly, which means that the variation in price is explained only a little better than the model with just one variable. If we see the vif values which checks the collinearity of the variable, we can see that all the continuous variables are highly collinear.
+
+
+
+
+
+
+## Random Forest Classification to predict cut
+
+In this section we will be using the Random Forest model to build a classification model to be able to effectively classify diamonds into 'Fair', 'Good', 'Very Good', 'Premium', 'Ideal' diamond cuts, using the base features.
+
+Prior to Random Forest Classification, Multi-nomial Logistic regression had been used but a very low accuracy score was found.
+
+
+### Multinomial Logistic Regression
+
+Before we dive into Random Forest Regression, lets perform a multinomial Logistic Regression and take a look at the accuracy score.
+
+```{r logisticReg}
+library(randomForest)
+require(caTools)
+library(MASS)
+require(nnet)
+# Training the multinomial model
+multinom_model <- multinom(cut ~ ., data = diamondsNO_train)
+
+# Checking the model
+summary(multinom_model)
+
+# Predicting the values for train dataset
+classPredicted <- predict(multinom_model, newdata = diamondsNO_test, "class")
+
+# Confusion matrix
+library(caret)
+cmlogit=confusionMatrix(diamondsNO_test$cut,classPredicted)
+cmlogit
+```
+
+Logistic Regression has an accuracy score of `r round((sum(diag(cmlogit$table))/sum(cmlogit$table))*100,2)`%.
+
+### Random Forest Regression
+
+With Logsitic regression performing poorly, we will test Random Forest Regression.
+
+First, we tune the Random Forest Model to get the best `mtry` (number of variables sampled at each split).
+
+```{r tuningRF, results='markup'}
+# Tuning Random Forest to get the best mtry (number of variables random sampled as candidates at each split)
+tune= tuneRF(diamondsNO_train[,-8],diamondsNO_trainCutLabel, stepFactor = 0.5, plot=TRUE,
+             ntreeTry=75,trace=TRUE, improve=0.05)
+
+```
+
+Note: `mtry` is the number of predictors sampled for splitting at each node.
+
+The chart above helps us choose the best `mtry` to get a minimal Out of Bag Error. Obviously, 6 is the best `mtry` with less than 22% OOB error.
+
+
+```{r rfc, results='markup'}
+
+rf<- randomForest(cut~ .,data=diamondsNO_train, mtry=6, ntree=75) #fitting RandomForest Classification
+pred = predict(rf, newdata=diamondsNO_test[,-8]) # Prediction on test set
+cm=confusionMatrix(diamondsNO_test$cut,pred) #confusion matrix
+print(rf)
+```
+
+The random forest classifier has been modeled with mtry as 6 and ntree as 75..
+
+```{r, results='markup'}
+xkabledply(cm$table,title="Confusion Matrix")
+cm$overall
+```
+
+The confusion matrix is seen above. Also, we get an accuracy score of `r cm$overall[1]*100`% for the test dataset.
+
+```{r,results='markup'}
+plot(rf)
+```
+
+The graph above shows that as the trees increases the Out of Bag Error reduces. While a larger size of trees greater than 75 does not reduce the out of bag error significantly.
+
+```{r importance,results='markup'}
+round(importance(rf), 2)
+```
+
+```{r, results='markup'}
+# Mean Decrease in Gini is the average (mean) of a variable's total decrease in node impurity
+varImpPlot(rf)
+```
+
+The mean decrease in Gini coefficient is a measure of how each variable contributes to the homogeneity of the nodes and leaves in the resulting random forest. The higher the value of mean decrease Gini score, the higher the importance of the variable in the model.
+
+In the above chart, `table` and `depth` have the highest importance in the Random Forest model.
+
+```{r}
+diamondsNO_train2= diamondsNO_train[,c(1, 2,3,4,5, 6,7,8,9)]
+diamondsNO_test2= diamondsNO_test[,c(1, 2,3,4,5, 6,7,8,9)]
+
+rf2<- randomForest(cut~ .,data=diamondsNO_train2,mtry=6, ntree=75) #fitting RandomForest Classification
+pred2 = predict(rf2, newdata=diamondsNO_test2[,-8]) # Prediction on test set
+cm2=confusionMatrix(diamondsNO_test2$cut,pred2) #confusion matrix
+print(rf2)
+```
+
+Removing least mean decrease gini feature (clarity) increases the Out of Bag error by 0.1%. We will stick to the first random forest model for predicting diamond cut type with minimal out of bag error. 
+
+```{r check,results='markup'}
+check= data.frame()
+# c('accuracy','precision','sensitivity','specificity')
+check=rbind(check,c(round((sum(diag(cmlogit$table))/sum(cmlogit$table))*100,2)))
+check=rbind(check,c(round((sum(diag(cm$table))/sum(cm$table))*100,2)))
+rownames(check)=c('logistic','random forest')
+colnames(check)=c("Accuracy Score")
+check$AverageSensitiviy=c((sum(cmlogit$byClass[1:5])/5)*100,(sum(cm$byClass[1:5])/5)*100)
+check$AverageSpecificity=c((sum(cmlogit$byClass[6:10])/5)*100,(sum(cm$byClass[6:10])/5)*100)
+check$AveragePrecision=c((sum(cmlogit$byClass[21:25])/5)*100,(sum(cm$byClass[21:25])/5)*100)
+
+barplot(height=as.matrix(check),beside=TRUE,names.arg = c("Accuracy","Sensitivity","Specificity","Precision"),legend.text = c("Logistic","RandoForest"),col=c("blue","green"))
+
+```
+
+The barplot above gives us a pictorial view of how Random Forest surpasses Logistic regression for classifying diamond cut type.
+
+
+
+
+## KNN modeling to predict cut  
+
+We want to build some KNN models to help cutting workers to decide which cutting method should be used on which diamond.  
+
+
+
+### pick numeric columns only  
+```{r}
+diamondscont_train <- subset(diamondsNO_SC_train, select = c ("carat", "depth", "table", "x", "y", "z"))
+diamondscont_test <- subset(diamondsNO_SC_test, select = c ("carat", "depth", "table", "x", "y", "z"))
+```
+
+We use all numeric variables as independent variables except price, because cutting workers don't know the sale price before cutting. 
+
+I added in price here, as I thought it would make sense from a customer perspective seeing what factors affect diamond cut. Even if the workers don't know it, as a customer I can still see if they are correlated after the fact
+
+I also split the data overall to 4:1, so that may affect results.
+
+
+```{r results='markup'}
+loadPkg("FNN")
+loadPkg("gmodels")
+loadPkg("caret")
+knn_pred <- knn(train = diamondscont_train  , test = diamondscont_test, cl=diamondsNO_SC_trainCutLabel, k=7)
+KNNCross <- CrossTable(diamondsNO_SC_testCutLabel, knn_pred, prop.chisq = FALSE)
+KNNCross
+```
+
+
+Here is the result of KNN model when K is equal to 7.  
+
+### check different k values   
+We also checked different K values.  
+```{r}
+ResultDf = data.frame( k=numeric(0), Total.Accuracy= numeric(0), row.names = NULL )
+for (kval in 3:15) {
+  knn_pred <- knn(train = diamondscont_train, test = diamondscont_test, cl=diamondsNO_SC_trainCutLabel, k=kval)
+  KNNCross <- CrossTable(diamondsNO_SC_testCutLabel, knn_pred, prop.chisq = FALSE)
+  print( paste("k = ", kval) )
+  KNNCross
+  # get confusion matrix
+  cm = confusionMatrix(knn_pred, reference = diamondsNO_SC_testCutLabel ) 
+  # get accuracy score
+  cmaccu = cm$overall['Accuracy']
+  print( paste("Total Accuracy = ", cmaccu ) )
+  # store into dataframe
+  cmt = data.frame(k=kval, Total.Accuracy = cmaccu, row.names = NULL )
+  ResultDf = rbind(ResultDf, cmt)
+  print( xkabledply(   as.matrix(cm), title = paste("ConfusionMatrix for k = ",kval ) ) )
+  print( xkabledply(data.frame(cm$byClass), title=paste("k = ",kval)) )
+}
+```
+
+### show different accuracy values  
+```{r results='markup'}
+xkabledply(ResultDf, "Total Accuracy Summary")
+```
+Above is the accuracy scores of different K values.  
+
+### draw "accuracy vs k" plot  
+```{r}
+ResultDf2 = data.frame( k=numeric(0), Total.Accuracy= numeric(0), row.names = NULL )
+for (kval in 1:20) {
+  knn_pred <- knn(train = diamondscont_train, test = diamondscont_test, cl=diamondsNO_SC_trainCutLabel, k=2*kval+1)
+  cm = confusionMatrix(knn_pred, reference = diamondsNO_SC_testCutLabel ) 
+  cmaccu = cm$overall['Accuracy']
+  cmt = data.frame(k=2*kval+1, Total.Accuracy = cmaccu, row.names = NULL )
+  ResultDf2 = rbind(ResultDf2, cmt)}
+```
+
+
+```{r}
+loadPkg("ggplot2")
+ggplot(ResultDf2,
+       aes(x = k, y = Total.Accuracy)) +
+  geom_line(color = "orange", size = 1.5) +
+  geom_point(size = 3) + 
+  labs(title = "accuracy vs k")+ 
+  theme_bw() + theme(panel.grid=element_blank())
+```
+From this plot we can see that from 3 to 17, the accuracy increases when K increases, but when K is bigger than 17, the accuracy begins to decrease.  
+So, the appropriate K range for KNN model is from 11 to 17, because in this range we have a great accuracy values.  
+
+
+
+## Conclusion
+
+### Were we successful in or modelling?
+
+### Future Research
+
+## References
+
+Agrawal, S. (2017, May 24). Diamonds. Kaggle.com. (https://www.kaggle.com/shivam2503/diamonds)
+
