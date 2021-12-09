@@ -320,15 +320,11 @@ diamondsNO_SC_testPriceLabel = diamondsNO_SC[samp1 == 2, 4]
 
 Upon removing outliers, `r nrow(z_scores)- nrow(diamondscontT2)` outliers were detected and removed.
 
-
-
 ## Linear Regression to predict price
 
+### Single Variable Models
 
-
-### single variables
-
-one model for each individual
+We started by creating one model for each numerical variable. All the models for this section will be created on the train data, so they then can be tested on the test data. We will be using adjusted r-squared as our criteria for the models.
 
 ``` {r single var models}
 modelcarat <- lm(price ~ carat,data=diamondsNO_train)
@@ -340,12 +336,16 @@ modelz <- lm(price ~ z,data=diamondsNO_train)
 
 ```
 
+Here are the results of the carat model, this turned out to be the best single variable model. It has an adjusted r-squared of `r summary(modelcarat)$adj.r.squared`
+
 ``` {r single var models 2, results = TRUE}
 loadPkg("sjPlot")
 loadPkg("sjmisc")
 loadPkg("sjlabelled")
 tab_model(modelcarat)
 ```
+
+Here are the results from depth and table, neither of which performed very well.
 
 ``` {r single var models 2.01, results = TRUE}
 tab_model(modeldepth)
@@ -354,6 +354,8 @@ tab_model(modeldepth)
 ``` {r single var models 2.02, results = TRUE}
 tab_model(modeltable)
 ```
+
+x, y, and z were all fairly good models, but did not beat out carat.
 
 ``` {r single var models 2.03, results = TRUE}
 tab_model(modelx)
@@ -367,13 +369,16 @@ tab_model(modely)
 tab_model(modelz)
 ```
 
-ANOVA of models
+Here is an ANOVA of the top four models, carat, x, y, and z in that order.
 
 ``` {r single var models 2.5, res, results = 'markup'}
 anovaRes = anova(modelcarat,modelx,modely,modelz)
 xkabledply(anovaRes, title = "ANOVA comparison between the models")
 ``` 
 
+We can see here that all the models are quite similar when it comes to predicting price.
+
+Here is a plot of the single variable model predicting on the test set.
 
 ``` {r single var models 3}
 loadPkg("modelr")
@@ -383,9 +388,9 @@ loadPkg("ggplot2")
 ggplot(df.with.predfin.from.model,aes(price,pred))+geom_point(aes(price,pred), alpha =0.2)+geom_line(aes(pred), colour="red", size=1) + labs(title = "Carat Linear Model to Predict Price", x = "Price", y = "Prediction") + xlim(c(0, 20000))
 ```
 
-Carat is the best singular model
+Carat does very well at the lower prices, but falls apart at the higher ones, so we will be looking to remedy this.
 
-### multinumeric variables
+### Multinumeric Linear Model
 
 
 ``` {r corrplot}
@@ -395,14 +400,9 @@ loadPkg("corrplot")
 corrplot.mixed(diamondscor)
 ```
 
-high correlation between many variables
+To start off, let's look at a correlation plot between all the variables. Already, we can see there are going to be some problems in models with multiple numeric variables, as many of them are correlated with each other.
 
-``` {r pairs plot}
-#loadPkg("lattice") 
-#pairs(diamondsnum[1:4])
-```
-
-removed the pairs plot for now cause I did not use in presentation and it takes too long to run
+Let's try to create a linear model using carat and x.
 
 ``` {r multinumeric models, results = TRUE}
 modelcaratx <- lm(price ~ carat+x,data=diamondsNO_train)
@@ -410,25 +410,32 @@ tab_model(modelcaratx)
 xkablevif(modelcaratx)
 ```
 
+As we can see, the model is pretty good, but has extremely high VIF values.
+
+Next let's try a linear model with carat and table.
+
 ``` {r multinumeric models2, results = TRUE}
 modelcarattable <- lm(price ~ carat+table,data=diamondsNO_train)
 tab_model(modelcarattable)
 xkablevif(modelcarattable)
 ```
 
+While this model has low VIF values, it has about the same adjusted r-squared as the carat model, so it is not much of an improvment.
+
+Just for fun, let's try a model with depth and x.
+
 ``` {r multinumeric models3, results = TRUE}
 modeldepthx <- lm(price ~ depth+x,data=diamondsNO_train)
 tab_model(modeldepthx)
 xkablevif(modeldepthx)
 ```
-Every multinumeric model is either a worse predictor, or has higher vif values
+This model is not terrible, but it does not beat the carat model, despite the low VIF values.
 
-There is no way to fix this from looking online
+After researching online, there is not really a good way to fix multicollinearity for a linear model. Most suggestions involve dropping the collinear variables, or increasing the sample size, both of which do not apply in this case. Because of this, we will move away from linear models with multiple numeric variables.
 
+### Numeric + Catergorical Models
 
-### multi numeric+continious variables
-
-trying out different models
+Let's start this section with a simple carat + cut model. We are going to primarily use carat here as it is was the best single variable model.
 
 ``` {r multi numeric+conitnious models, results = TRUE}
 modelcaratcut <- lm(price ~ carat+cut, data = diamondsNO_train)
@@ -436,13 +443,14 @@ tab_model(modelcaratcut)
 xkablevif(modelcaratcut)
 ``` 
 
+Right off the bat this is very promising, its adjusted r-squared beats the carat model by a bit. Let's try models for clarity and color as well.
+
 ``` {r multi numeric+conitnious models2, results = TRUE}
 modelcaratclarity <- lm(price ~ carat+clarity, data = diamondsNO_train)
 tab_model(modelcaratclarity)
 xkablevif(modelcaratclarity)
 ```
 
-This model is the best
 
 ``` {r multi numeric+conitnious models3, results = TRUE}
 modelcaratcolor <- lm(price ~ carat+color, data = diamondsNO_train)
@@ -450,13 +458,17 @@ tab_model(modelcaratcolor)
 xkablevif(modelcaratcolor)
 ```
 
+The carat + clarity model is great, with an adjusted r.squared of `r summary(modelcaratclarity)$adj.r.squared`. It easily is the best model overall, even beating out the carat model. On top of this, it does not have high VIF values.
+
+Since all three of the variables made a difference, let's try a carat + color + cut + clarity model.
+
 ``` {r multi numeric+conitnious models4, results = TRUE}
 modelcaratccc <- lm(price ~ carat+color+cut+clarity, data = diamondsNO_train)
 tab_model(modelcaratccc)
 xkablevif(modelcaratccc)
 ```
 
-Now this model is the best
+This model is outstanding, with low VIF values and an adjusted r-squared of `r summary(modelcaratccc)$adj.r.squared`. This is clearly the best model out of the bunch.
 
 ``` {r caratccc plot}
 df.with.predfin.from.model <- add_predictions(diamondsNO_test,modelcaratccc)
@@ -465,9 +477,11 @@ loadPkg("ggplot2")
 ggplot(df.with.predfin.from.model,aes(price,pred))+geom_point(aes(price,pred), alpha =0.2)+geom_line(aes(pred), colour="red", size=1) + labs(title = "Carat + Color + Cut + Clarity Linear Model", x = "Price", y = "Prediction") + xlim(c(0, 20000))
 ```
 
-almost looks like a polynomial curve?
+Here we can see the best model's prediction on the test set, performing quite well overall.
 
-### interaction terms
+### Interaction Terms
+
+Now let's try adding some interaction terms to the models.
 
 ``` {r interaction terms, results = TRUE}
 modelcaratccci <- lm(price ~ carat * clarity, data = diamondsNO_train)
@@ -475,7 +489,7 @@ tab_model(modelcaratccci)
 xkablevif(modelcaratccci)
 ```
 
-pretty good model
+Here we can the the carat * clarity model. This model has extremely high VIF values, and does not beat the best model.
 
 ``` {r interaction terms2, results = TRUE}
 modelcaratccci2 <- lm(price ~ carat + (color+cut+clarity)^2, data = diamondsNO_train)
