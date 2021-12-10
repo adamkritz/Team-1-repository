@@ -463,12 +463,12 @@ The carat + clarity model is great, with an adjusted r.squared of `r summary(mod
 Since all three of the variables made a difference, let's try a carat + color + cut + clarity model.
 
 ``` {r multi numeric+conitnious models4, results = TRUE}
-modelcaratccc <- lm(price ~ carat+color+cut+clarity, data = diamondsNO_train)
+modelcaratccc = lm(price ~ carat+color+cut+clarity, data = diamondsNO_train)
 tab_model(modelcaratccc)
 xkablevif(modelcaratccc)
 ```
 
-This model is outstanding, with low VIF values and an adjusted r-squared of `r summary(modelcaratccc)$adj.r.squared`. This is clearly the best model out of the bunch.
+This model, the C+C+C+C model for short, is outstanding, with low VIF values and an adjusted r-squared of `r summary(modelcaratccc)$adj.r.squared`. This is clearly the best model out of the bunch.
 
 ``` {r caratccc plot}
 df.with.predfin.from.model <- add_predictions(diamondsNO_test,modelcaratccc)
@@ -492,71 +492,105 @@ xkablevif(modelcaratccci)
 Here we can the the carat * clarity model. This model has extremely high VIF values, and does not beat the best model.
 
 ``` {r interaction terms2, results = TRUE}
-modelcaratccci2 <- lm(price ~ carat + (color+cut+clarity)^2, data = diamondsNO_train)
+modelcaratccci2 = lm(price ~ carat + (color+cut+clarity)^2, data = diamondsNO_train)
 tab_model(modelcaratccci2)
 xkablevif(modelcaratccci2)
 ```
 
-high VIF values
+This model, the carat + (color+cut+clarity)^2 model, actually does have a higher adjusted r-squared than the C+C+C+C model, at `r summary(modelcaratccci2)$adj.r.squared`. However, it also has high VIF values, indicating it should not be used.
 
 ``` {r interaction terms3, results = TRUE}
-modelcaratccci3 <- lm(price ~ (carat + clarity)^2, data = diamondsNO_train)
+modelcaratccci3 = lm(price ~ (carat + clarity)^2, data = diamondsNO_train)
 tab_model(modelcaratccci3)
 xkablevif(modelcaratccci3)
 ```
 
-pretty great again, but high VIF
+And lastly, this model does not beat the best model either.
 
+Overall, nothing is able to compete with the C+C+C+C model. Even of those not included in this section, nothing was able to beat its adjusted r-squared.
 
-Nothing with interaction terms beats the carat + ccc model
+### Feature Selection
 
-### feature selection
+Usually, when one is building a linear model, they start with feature selection in order to try to come up with the best model to use. However, due to the limited number of varaibles, it was easier to start with a model and then use the feature selection to confirm our findings.
+
+Let's start with an exhaustive search.
 
 ```{r ft, results = TRUE}
 loadPkg("leaps")
-#This is essentially best fit 
-reg.best10 <- regsubsets(price~. , data = diamondsNO_train, nvmax = 10, nbest = 1, method = "exhaustive")  # leaps::regsubsets() - Model selection by exhaustive (default) search, forward or backward stepwise, or sequential replacement
-#The plot will show the Adjust R^2 when using the variables across the bottom
+reg.best10 = regsubsets(price~. , data = diamondsNO_train, nvmax = 10, nbest = 1, method = "exhaustive")  
 plot(reg.best10, scale = "adjr2", main = "Exhaustive Adjusted R^2")
 ```
 
-all types of models look the same, so just stick to adjusted R squared
+Here we can see that the exhaustive model begins to prove our suspicions. Carat is the best single variable for the model, followed by traits of clarity and color. This makes sense, as our best model uses these as predictors. It should be noted that using other criteria, like r-squared, BIC, or Cp created the same results.
+
+Now let's try forward selection.
 
 ```{r feature selection 2}
 reg.forward10 <- regsubsets(price~., data = diamondsNO_train, nvmax = 10, nbest = 1, method = "forward")
 plot(reg.forward10, scale = "adjr2", main = "Forward Adjusted R^2")
-# summary(reg.forward10)
 ```
 
-
-again all the same
-
+This feature selection process is nearly identical to the last one. Let's try both backward and segrep feature selection
 
 ```{r feature selection 3}
 reg.forward10 <- regsubsets(price~., data = diamondsNO_train, nvmax = 10, nbest = 1, method = "backward")
 plot(reg.forward10, scale = "adjr2", main = "Backward Adjusted R^2")
-# summary(reg.forward10)
 ```
-
-same
 
 
 ```{r feature selection 4}
 reg.forward10 <- regsubsets(price~., data = diamondsNO_train, nvmax = 10, nbest = 1, method = "seqrep")
 plot(reg.forward10, scale = "adjr2", main = "Sequential Replacement Adjusted R^2")
-# summary(reg.forward10)
 ```
 
-same
+In all of these feature selection techniques, carat is the most important, followed by clarity and color. It should be noted that despite cut making a difference in the C+C+C+C model, it did not show up much here.
 
-All feature selections reflects our findings, and is all the same basically
+Let's bring the C+C+C+C model into the testing phase.
 
-Finally, let's test the accuracy of the best linear model on the test data.
 
-```{r testing}
+### Testing the Best Model
 
+Finally, let's test the accuracy of the best linear model on the test data. Firstly, let's simple check the adjusted r-squared value of a linear model on the test data. 
+
+```{r testing, results = TRUE}
+modelcaratcccT = lm(price ~ carat+color+cut+clarity, data = diamondsNO_test)
+tab_model(modelcaratcccT)
+xkablevif(modelcaratcccT)
 ```
 
+We can see that the model performs just as well when using the test data as it did on the training data. It also has no high VIF values.
+
+The adjusted r-squared is `r summary(modelcaratcccT)$adj.r.squared`, meaning that roughly 92% of the variation in price can be explained by our model.
+
+```{r testing2}
+df.with.predfin.from.model <- add_predictions(diamondsNO_test,modelcaratcccT)
+head(df.with.predfin.from.model)
+loadPkg("ggplot2")
+ggplot(df.with.predfin.from.model,aes(price,pred))+geom_point(aes(price,pred), alpha =0.2)+geom_line(aes(pred), colour="red", size=1) + labs(title = "C+C+C+C Model Built on Test Data", x = "Price", y = "Prediction") + xlim(c(0, 20000))
+```
+
+Here we can see how well the model performs when predicting on the test data. It performs quite well.
+
+Lastly, let's look at one other metric of of the linear model on the test data. The mean absolute error of the model is `r mean(abs(summary(modelcaratcccT)$residuals))`. This means that on average, the model misses the price by plus or minus `r mean(abs(summary(modelcaratcccT)$residuals))`. This may seem high, but it is largely due to a few outliers. This can be seen in the residual models.
+
+
+```{r test5}
+res <- resid(modelcaratcccT)
+qqnorm(res, ann = FALSE)
+qqline(res)
+title("Residual Plot 1", xlab="Price (z-score)", ylab="Residuals")
+```
+
+Our model performs really well at middle price values, but struggles at higher and lower prices.
+
+```{r test6}
+plot(density(res), ann = FALSE)
+title("Residual Plot 2", xlab="Residuals", ylab="Density")
+```
+
+Here we can see again that the model performs well overall, but has a lot of outliers. 
+
+Overall, our model performed quite well on the test data. In the future, we will definitely look into techniques so the model can be more accurate at higher and lower prices.
 
 ## PCR modeling to predict price
 
