@@ -782,8 +782,7 @@ The barplot above gives us a pictorial view of how Random Forest surpasses Logis
 
 ## KNN modeling to predict cut  
 
-We want to build some KNN models to help cutting workers to decide which cutting method should be used on which diamond.  
-
+Different cutting levels cost different amounts of money, so it is a waste of money to use high level cutting method on low quality diamond raw materials. We want to build some KNN models to help cutting workers to decide which cutting method should be used on which diamond, and We hope this model can help workers reduce the loss caused by misjudgment.  
 
 
 ### pick numeric columns only  
@@ -792,12 +791,13 @@ diamondscont_train <- subset(diamondsNO_SC_train, select = c ("carat", "depth", 
 diamondscont_test <- subset(diamondsNO_SC_test, select = c ("carat", "depth", "table", "x", "y", "z"))
 ```
 
-We use all numeric variables as independent variables except price, because cutting workers don't know the sale price before cutting. 
+We use all numeric variables as independent variables except price, because cutting workers don't know the sale price before cutting. All information that workers can get is the physical information of diamonds.  
 
-I added in price here, as I thought it would make sense from a customer perspective seeing what factors affect diamond cut. Even if the workers don't know it, as a customer I can still see if they are correlated after the fact
+We also split the data overall to training set and testing set as 4:1, to check these models' performance on prediction. Also, we standardized all these numeric variables.   
 
-I also split the data overall to 4:1, so that may affect results.
+### K = 7  
 
+Here is the result of KNN model when K is equal to 7.  
 
 ```{r results='markup'}
 loadPkg("FNN")
@@ -808,11 +808,11 @@ KNNCross <- CrossTable(diamondsNO_SC_testCutLabel, knn_pred, prop.chisq = FALSE)
 KNNCross
 ```
 
-
-Here is the result of KNN model when K is equal to 7.  
+From the result, we can see the percision, recall rate and F-1 score of each level. For fair, good, premium, and ideal levels, these three scores is all great. But for very good level, the recall rate is only 0.373, and F-1 score is only 0.453. We can check the confusion metrix. There are 758 diamonds which actually is in very good level are predicted to be premium level and 573 are predicted to be ideal level. So this model works no so good on very good level.  
+However, overall, the whole accuracy of this model is about 0.72. It is a good prediction model.
 
 ### check different k values   
-We also checked different K values.  
+We also checked different K values and want to find the appropriate K range.    
 ```{r}
 ResultDf = data.frame( k=numeric(0), Total.Accuracy= numeric(0), row.names = NULL )
 for (kval in 3:15) {
@@ -837,7 +837,7 @@ for (kval in 3:15) {
 ```{r results='markup'}
 xkabledply(ResultDf, "Total Accuracy Summary")
 ```
-Above is the accuracy scores of different K values.  
+Above is the accuracy scores of different K values in testing set.  
 
 ### draw "accuracy vs k" plot  
 ```{r}
@@ -860,8 +860,8 @@ ggplot(ResultDf2,
   labs(title = "accuracy vs k")+ 
   theme_bw() + theme(panel.grid=element_blank())
 ```
-From this plot we can see that from 3 to 17, the accuracy increases when K increases, but when K is bigger than 17, the accuracy begins to decrease.  
-So, the appropriate K range for KNN model is from 11 to 17, because in this range we have a great accuracy values.  
+From this plot we can see that from 3 to 11, the accuracy increases when K increases. When K is between 11 and 21, The accuracy rate is declining fluctuatingly, But when K is larger than 21, the accuracy begins to decrease.  
+So, the appropriate K range for KNN model is from 9 to 15, because in this range the KNN models have a great accuracy values.  
 
 
 
