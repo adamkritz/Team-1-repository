@@ -668,6 +668,50 @@ If we try to build a model with more than one variable as above, we can see that
 
 
 
+### Testing the Best Model
+
+Let's test the accuracy of the best linear model on the test data. Firstly, let's simple check the adjusted r-squared value of a linear model on the test data. 
+
+```{r testing, results = TRUE}
+modelcaratT = lm(price ~ carat, data = diamondsNO_test)
+tab_model(modelcaratT)
+
+```
+
+The model performs just as well when using the test data as it did on the training data.
+
+The adjusted r-squared is `r summary(modelcaratT)$adj.r.squared`, meaning that roughly 85% of the variation in price can be explained by our model.
+
+```{r testing2}
+df.with.predfin.from.model1 <- add_predictions(diamondsNO_test,modelcaratT)
+head(df.with.predfin.from.model1)
+loadPkg("ggplot2")
+ggplot(df.with.predfin.from.model1,aes(price,pred))+geom_point(aes(price,pred), alpha =0.2)+geom_line(aes(pred), colour="red", size=1) + labs(title = "Carat Model Built on Test Data", x = "Price", y = "Prediction") + xlim(c(0, 20000))
+```
+
+Here we can see how well the model performs when predicting on the test data. It performs quite well.
+
+Lastly, let's look at one other metric of of the linear model on the test data. The mean absolute error of the model is `r mean(abs(summary(modelcaratT)$residuals))`. This means that on average, the model misses the price by plus or minus `r mean(abs(summary(modelcaratT)$residuals))`.
+
+
+```{r test5}
+res1 <- resid(modelcaratT)
+qqnorm(res1, ann = FALSE)
+qqline(res1)
+title("Residual Plot 1", xlab="Price (z-score)", ylab="Residuals")
+```
+
+
+
+```{r test6}
+plot(density(res1), ann = FALSE)
+title("Residual Plot 2", xlab="Residuals", ylab="Density")
+```
+
+Here we can see again that the model performs well overall, but has quite a few outliers. 
+
+The model performs well on test data overall.
+
 
 ## Random Forest Classification to predict cut
 
