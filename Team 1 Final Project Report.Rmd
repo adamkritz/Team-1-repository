@@ -106,7 +106,7 @@ For the final project, we wanted to use a wide variety of models to predict both
 We had done a little bit of work on the linear model in the midterm, but we are now interested in improving on the model by using categorical variables. We are also interested in using the model for predictions. The first two questions of the linear model are a refresher from the midterm, and the last three employ our knew knowledge.
 
 * Principal Component Regression (PCR) for price
-    + Which of the following variables exhibiting multicollinearity can be eliminated for regression after PCA : x, y, z, table, carat and depth?
+    + Which of the following variables but one exhibiting multicollinearity can be eliminated for regression after PCA : x, y, z, table, carat and depth?
     
 PCR is a newer modelling technique we are interested in, and we hope it is able to work in tandem with the linear model to predict price.
 
@@ -594,35 +594,43 @@ Overall, our model performed quite well on the test data. In the future, we will
 
 ## PCR modeling to predict price
 
-We first subset the continuous variables from the dataframe to a new dataframe.
 
+For PCR modeling, we first subset all the continuous variables from the original dataframe.
+It is a must that the data is scaled and centered, before performing PCR.
 
 ```{r, results='markup'}
 diamondscont <- subset(diamondsNO_SC_train, select = c ("carat", "depth", "table", "price", "x", "y", "z"))
 ```
 
+Now, we can obtain the Principal components of our desired model. 
+```{r, results='markup'}
+pcrcomp <- prcomp(diamondscont, scale = TRUE)
+summary(pcrcomp)
+pcrcomp$rotation
 
-Running the PCR model using pls library : 
 
+```
+
+From the above Principal components we can see that PC1 is affected by x and carat the most. We can build the model with one or more Principal components depending on the variance in price explained. In our case, we are trying to eliminate all but one continuous variables since they are collinear. Let us run a principal regression model from the Pls library and see the results. By performing PCR we can tackle the problem of multi-collinearity. We need to keep in mind the RMSE values while evaluating the model since the VIF checks will show 1 or less than 1 for data that is scaled.
 
 ```{r, results='markup'}
 library(pls)
 pcr_model <- pcr(price~., data = diamondscont,ncomp=6, validation = "CV")
 summary(pcr_model)
 validationplot(pcr_model)
-pcrcomp <- prcomp(diamondscont, scale = TRUE)
-summary(pcrcomp)
-pcrcomp$rotation
+
 ```
 
-We can see from the results of the PCR model that with just one component we can explain around 79 % of variation in price and as the components increase, the variation in price explained increases very marginally so it would make sense to build a model with just one variable. 
+We can see from the results of the PCR model that with just one component we can explain around 79 % of variation in price and as the components increase, the variation in price explained increases very marginally so it would make sense to build a model with just one variable. We can also look at the validation plot and see that with just one component, the RMSE probability value drops to favorable levels(below 0.4) and with the addition of more variables, the RMSE probability value only decreases slightly. Due to these findings, it is more sensible to build a model with just one variable or component and achieve good results without bringing down the efficiency of the model.
+
+If we wish to select one of the continuous variables since they are all collinear, we can choose the PC1 which is mostly affected by the carat of the diamond.
 
 We will try to build a linear model with one variable from the PC1. x, y, z and carat have highest probabilities.
 
 
 ### Linear regression model with 1 component
 ```{r, results='markup'}
-linear_model_pcr_1a = lm(price~ x   , data= diamondsNO_train)
+linear_model_pcr_1a = lm(price~ x + depth , data= diamondsNO_train)
 summary(linear_model_pcr_1a)
 ```
 
