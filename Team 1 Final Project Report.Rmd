@@ -933,6 +933,7 @@ ggplot(ResultDf2,
   labs(title = "accuracy vs k")+ 
   theme_bw() + theme(panel.grid=element_blank())
 ```
+  
 From this plot we can see that from 3 to 11, the accuracy increases when K increases. When K is between 11 and 21, The accuracy rate is declining fluctuatingly, But when K is larger than 21, the accuracy begins to decrease.  
 So, the appropriate K range for KNN model is from 9 to 15, because in this range the KNN models have a great accuracy values.  
 
